@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { CiHeart } from "react-icons/ci";
 import { IoCartOutline, IoPersonSharp } from "react-icons/io5";
+import Navigation from "../Menu/Navigation";
 import Search from "../Search";
 const Headers = () => {
   return (
-    <div className="">
-      <div className="flex justify-evenly items-center p-2 bg-[#f5f5f5] w-full">
-        <Link href="/" className="w-[30%] sm:w-[10%] order-1">
+    <header className=" bg-[#f5f5f5] w-full">
+      <section className="flex sm:justify-evenly justify-between items-center p-2 max-w-[1280px] mx-auto">
+        <Link href="/" className="w-[30%] sm:w-[20%] order-1">
           <Image src={Logo} height={"100%"} width={"100%"} alt="cartout" />
         </Link>
         {/* search */}
@@ -35,11 +36,13 @@ const Headers = () => {
             </span>
           </div>
         </div>
-      </div>
+      </section>
       <div className="w-full sm:hidden p-2">
         <Search />
       </div>
-    </div>
+      {/* Navigation */}
+      <Navigation />
+    </header>
   );
 };
 
