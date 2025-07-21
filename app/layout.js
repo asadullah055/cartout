@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer/Footer";
 import Headers from "@/components/Header/Header";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
@@ -26,12 +27,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={` ${montserrat.variable} antialiased`}
-      >
-        <Headers/>
-        
+      <body className={` ${montserrat.variable} antialiased`}>
+        <Headers />
+
         {children}
+        <Footer />
       </body>
     </html>
   );

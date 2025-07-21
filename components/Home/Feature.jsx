@@ -9,12 +9,12 @@ const Feature = () => {
       <h1 className="text-center text-[25px] font-[700] text-[#333333] mb-6">
         FEATURED PRODUCTS
       </h1>
-      <ul className="flex justify-center items-center gap-6 uppercase font-bold">
+      <ul className="flex justify-center text-[14px] items-center gap-3 md:gap-5 uppercase font-bold">
         {items.map((item) => (
           <li
             key={item}
             onClick={() => setActiveTab(item)}
-            className={`cursor-pointer relative pb-1 group transition-all duration-200 ${
+            className={`cursor-pointer relative pb-1 group transition-all duration-200 whitespace-nowrap ${
               activeTab === item
                 ? "text-orange-500"
                 : "text-gray-500 hover:text-orange-400"
