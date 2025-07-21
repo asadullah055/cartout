@@ -1,17 +1,13 @@
-import LogoImage from "@/public/images/001jpeg.jpeg";
-import Image from "next/image";
+import Feature from "@/components/Home/Feature";
+import Hero from "@/components/Home/Hero";
+import FeaturedProducts from "@/components/Products/FeaturedProducts";
+
 export default function Home() {
   return (
     <main className="max-w-[1280px] mx-auto">
-      <div className="flex flex-wrap ">
-        <div className="w-[67%] p-1">
-          <Image src={LogoImage} height={800} width={1600} alt="sjkld" />
-        </div>
-        <div className="w-[33%] p-1 flex flex-col justify-center items-center gap-2">
-          <Image src={LogoImage} height={260} width={800} alt="sjkld" />
-          <Image src={LogoImage} height={260} width={800} alt="sjkld" />
-        </div>
-      </div>
+      <Hero />
+      <Feature/>
+      <FeaturedProducts/>
     </main>
   );
 }
