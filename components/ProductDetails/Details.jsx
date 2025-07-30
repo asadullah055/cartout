@@ -72,7 +72,7 @@ const Details = () => {
         </button>
       </div>
       {/* Add to cart and by now button */}
-      <div className="mt-4 flex items-center gap-2 sm:w-[70%] w-full">
+      <div className="mt-4 flex items-center gap-2 md:w-[80%] w-full">
         <button className="bg-amber-400 px-4 py-2 rounded hover:bg-white border border-amber-400 transition duration-200 cursor-pointer w-[40%]">
           Buy Now
         </button>

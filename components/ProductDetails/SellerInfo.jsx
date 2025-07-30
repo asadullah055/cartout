@@ -38,17 +38,17 @@ const SellerInfo = () => {
 
       {/* Product Info */}
       <div className="space-y-1">
-        <p>
+        <p className="capitalize">
           <strong>SKU:</strong> N/A
         </p>
-        <p>
-          <strong>CATEGORY:</strong> WGP MINI UPS
+        <p className="capitalize">
+          <strong>CATEGORY:</strong> WGP Mini ups
         </p>
-        <p>
-          <strong>TAGS:</strong> POWER BANK, WGP, WGP MINI UPS
+        <p className="capitalize">
+          <strong>TAGS:</strong> Power Band, UPS
         </p>
-        <p>
-          <strong>BRAND:</strong> WGP
+        <p className="capitalize">
+          <strong>BRAND:</strong> wgp
         </p>
       </div>
     </div>

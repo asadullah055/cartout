@@ -2,7 +2,8 @@
 
 import { AiOutlineMenu } from "react-icons/ai";
 import { CiHeart } from "react-icons/ci";
-import { IoCartOutline, IoPersonSharp } from "react-icons/io5";
+import { IoPersonSharp } from "react-icons/io5";
+import CartDrawer from "../Cart/CartDrawer";
 import Navigation from "../Menu/Navigation";
 import Search from "../Search";
 import Logo from "./Logo";
@@ -29,12 +30,13 @@ const Headers = () => {
             <IoPersonSharp size={30} />
           </div>
           {/* cart */}
-          <div className="cursor-pointer relative">
+          {/* <div className="cursor-pointer relative ">
             <IoCartOutline size={30} />
             <span className="w-[16px] h-[16px] inline-block bg-red-500 text-white rounded-full text-[10px] leading-4 text-center -top-2 -right-1 absolute">
-              0
+              10
             </span>
-          </div>
+          </div> */}
+          <CartDrawer />
         </div>
       </section>
       <div className="w-full sm:hidden p-2 pb-1">

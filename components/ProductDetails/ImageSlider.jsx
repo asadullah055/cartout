@@ -43,7 +43,7 @@ const ImageSlider = () => {
   };
 
   return (
-    <div>
+    <div className="border overflow-hidden p-3">
       {/* Main Image with Zoom */}
       <div className="w-full h-[300px]  rounded overflow-hidden relative">
         <div className="mx-auto w-[400px] h-[300px] flex items-center">
