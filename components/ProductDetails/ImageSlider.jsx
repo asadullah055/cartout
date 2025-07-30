@@ -1,25 +1,23 @@
 "use client";
 import { useRef, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import ReactImageZoom from "react-image-zoom";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 const images = [
-  "/images/001.jpg",
   "/images/001jpeg.jpeg",
-  "/images/001.jpg",
+  "/images/012.jpg",
   "/images/001jpeg.jpeg",
-  "/images/001.jpg",
-  "/images/001jpeg.jpeg",
+  "/images/012.jpg",
 ];
 
 const ImageSlider = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const swiperRef = useRef(null);
 
   const handleSwiperInit = (swiper) => {
@@ -36,47 +34,31 @@ const ImageSlider = () => {
     }
   };
 
+  const zoomProps = {
+    width: 500,
+    // height: 500,
+    // zoomWidth: 400,
+    img: images[selectedIndex],
+    zoomPosition: "original",
+  };
+
   return (
-    <div className="">
-      {/* Main Image */}
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={(e) => {
-          setIsHovered(false);
-          e.currentTarget.style.backgroundPosition = "center";
-        }}
-        onMouseMove={(e) => {
-          if (!isHovered) return;
-          const { left, top, width, height } =
-            e.currentTarget.getBoundingClientRect();
-          const x = ((e.clientX - left) / width) * 100;
-          const y = ((e.clientY - top) / height) * 100;
-          e.currentTarget.style.backgroundPosition = `${x}% ${y}%`;
-        }}
-        className="w-full h-96 border rounded overflow-hidden relative cursor-zoom-in transition-all duration-200 ease-in-out"
-        style={{
-          backgroundImage: `url(${images[selectedIndex]})`,
-          backgroundSize: isHovered ? "150%" : "100%",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
-          backgroundColor: "#fff",
-        }}
-      >
-        {/* <img
-          src={images[selectedIndex]}
-          alt="Selected"
-          className="w-full h-full object-contain opacity-0"
-        /> */}
+    <div>
+      {/* Main Image with Zoom */}
+      <div className="w-full h-[300px]  rounded overflow-hidden relative">
+        <div className="mx-auto w-[400px] h-[300px] flex items-center">
+          <ReactImageZoom {...zoomProps} />
+        </div>
       </div>
 
       {/* Thumbnail Slider */}
       <div className="relative mt-4">
-        {/* Custom Prev Arrow */}
+        {/* Prev Arrow */}
         <button
           disabled={isBeginning}
-          className={`custom-prev absolute -left-3 top-1/2 -translate-y-1/2 z-10 text-2xl   p-2 rounded-full ${
+          className={`custom-prev absolute -left-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${
             isBeginning
-              ? " cursor-not-allowed"
+              ? "cursor-not-allowed opacity-50"
               : "hover:bg-gray-100 hover:cursor-pointer"
           }`}
         >
@@ -94,7 +76,6 @@ const ImageSlider = () => {
           allowTouchMove={false}
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
-          className="pl-8 pr-8"
         >
           {images.map((img, index) => (
             <SwiperSlide key={index}>
@@ -108,13 +89,13 @@ const ImageSlider = () => {
           ))}
         </Swiper>
 
-        {/* Custom Next Arrow */}
+        {/* Next Arrow */}
         <button
           disabled={isEnd}
-          className={`custom-next  absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-2xl  p-2 rounded-full ${
+          className={`custom-next absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${
             isEnd
-              ? "cursor-not-allowed"
-              : "hover:bg-gray-200 hover:cursor-pointer"
+              ? "cursor-not-allowed opacity-50"
+              : "hover:bg-gray-100 hover:cursor-pointer"
           }`}
         >
           <IoIosArrowForward />

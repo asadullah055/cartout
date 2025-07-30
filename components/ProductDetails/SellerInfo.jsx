@@ -1,38 +1,37 @@
-import { FaCommentDots } from "react-icons/fa";
+import { IoMdChatbubbles } from "react-icons/io";
 
 const SellerInfo = () => {
   return (
-    <div className="rounded-md p-4 text-sm space-y-4 text-gray-700">
+    <div className="rounded-md p-4 text-sm space-y-4 text-gray-800">
       {/* Sold by and Chat */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center border-b pb-3 border-gray-200">
         <div>
-          <p className="text-gray-500 text-xs">Sold by</p>
-          <p className="text-blue-800 font-semibold">Vivo Official</p>
+          <p className="text-gray-800 font-semibold text-xs">Sold by</p>
+          <p className="uppercase text-[16px] font-medium">Cartout Retailer</p>
         </div>
-        <button className="flex items-center gap-1 text-blue-600 text-sm font-medium">
-          <FaCommentDots /> Chat Now
+        <button
+          disabled
+          className="flex items-center gap-1 text-blue-600 text-sm font-medium"
+        >
+          <IoMdChatbubbles /> Chat Now
         </button>
       </div>
 
       {/* Seller Ratings */}
-      <div className="grid grid-cols-3 gap-2 text-center border-t border-b py-3">
-        <div>
-          <p className="text-gray-500 text-xs">Positive Seller Ratings</p>
-          <p className="text-gray-400 text-sm">New Seller</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-xs">Ship on Time</p>
-          <p className="text-black font-semibold text-lg">100%</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-xs">Chat Response Rate</p>
-          <p className="text-gray-400 text-sm">Not enough data</p>
-        </div>
+      <div className="grid grid-cols-3 gap-2">
+        <p className="text-gray-500 text-xs">Positive Seller Ratings</p>
+        <p className="text-gray-500 text-xs">Ship on Time</p>
+        <p className="text-gray-500 text-xs">Chat Response Rate</p>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <p className="text-black font-semibold text-lg text-center">100%</p>
+        <p className="text-black font-semibold text-lg text-center">100%</p>
+        <p className="text-black font-semibold text-lg text-center">100%</p>
       </div>
 
       {/* Go to Store */}
       <div className="text-center">
-        <button className="text-blue-600 text-sm font-medium hover:underline">
+        <button className="text-blue-600 cursor-pointer text-sm font-medium hover:underline">
           GO TO STORE
         </button>
       </div>
@@ -51,11 +50,6 @@ const SellerInfo = () => {
         <p>
           <strong>BRAND:</strong> WGP
         </p>
-      </div>
-
-      {/* Logo */}
-      <div className="pt-2 flex justify-center">
-        <img src="/images/cartout.png" alt="WGP logo" className="w-30" />
       </div>
     </div>
   );

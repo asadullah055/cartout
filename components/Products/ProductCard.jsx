@@ -5,7 +5,7 @@ const ProductCard = ({ product }) => {
       )
     : null;
   return (
-    <div className="bg-white hover:shadow-md rounded-md p-2 md:p4 w-full mt-2 ">
+    <div className="bg-white hover:shadow-md rounded-md p-3 md:p4 w-full mt-2 ">
       <div className="relative">
         {discount && (
           <span className="absolute top-1 right-1 bg-red-600 text-white text-sm px-2 py-0.5 rounded">
@@ -22,7 +22,7 @@ const ProductCard = ({ product }) => {
         {product.title}
       </h2>
       <div className="flex justify-center items-center gap-2 mt-1">
-        <span className="text-red-600 font-bold text-[18px]">
+        <span className="text-[#ff3300] font-bold text-[18px]">
           ৳{product.price}
         </span>
         {product.discountPrice && (
@@ -32,10 +32,10 @@ const ProductCard = ({ product }) => {
         )}
       </div>
       <div className="mt-2 flex justify-between gap-2">
-        <button className="bg-orange-600 text-[9px] md:text-[12px] text-white p-1 rounded text-sm cursor-pointer font-bold">
+        <button className="bg-[#ff3300] text-[9px] md:text-[12px] text-white p-1 px-2 rounded text-sm cursor-pointer font-bold">
           BUY NOW
         </button>
-        <button className="text-[9px] md:text-[12px] p-1 text-orange-500 border border-orange-600  rounded text-sm cursor-pointer font-bold">
+        <button className="text-[9px] md:text-[12px] p-1 px-2 text-orange-500 border border-orange-600  rounded text-sm cursor-pointer font-bold">
           ADD TO CART
         </button>
       </div>
