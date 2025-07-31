@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { GoHomeFill } from "react-icons/go";
@@ -208,9 +209,13 @@ export default function CartDrawer() {
               <span>৳ {total}</span>
             </div>
             <div className="flex justify-between gap-2">
-              <button className="bg-amber-400 px-2 py-2 rounded hover:bg-white border border-amber-400 transition duration-200 cursor-pointer w-1/2">
+              <Link
+                href="/cart"
+                onClick={toggleDrawer}
+                className="bg-amber-400 px-2 py-2 rounded hover:bg-white border border-amber-400 transition duration-200 cursor-pointer w-1/2 text-center"
+              >
                 View Cart
-              </button>
+              </Link>
               <button className="bg-[#ff3300] text-white px-2 py-2 rounded hover:bg-orange-600 transition duration-200 cursor-pointer w-1/2">
                 Checkout Now ({cartItems.length})
               </button>

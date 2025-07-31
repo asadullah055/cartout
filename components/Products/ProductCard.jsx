@@ -31,11 +31,11 @@ const ProductCard = ({ product }) => {
           </span>
         )}
       </div>
-      <div className="mt-2 flex justify-between gap-2">
-        <button className="bg-[#ff3300] text-[9px] md:text-[12px] text-white p-1 px-2 rounded text-sm cursor-pointer font-bold">
+      <div className="mt-2 flex justify-between gap-1 sm:gap-2">
+        <button className="bg-[#ff3300] text-[10px] md:text-[12px] text-white p-1 sm:px-2 rounded text-sm cursor-pointer font-bold">
           BUY NOW
         </button>
-        <button className="text-[9px] md:text-[12px] p-1 px-2 text-orange-500 border border-orange-600  rounded text-sm cursor-pointer font-bold">
+        <button className="text-[10px] md:text-[12px] p-1 sm:px-2 text-orange-500 border border-orange-600  rounded text-sm cursor-pointer font-bold">
           ADD TO CART
         </button>
       </div>
