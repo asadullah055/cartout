@@ -202,7 +202,7 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* Footer */}
+          {/* Footer */} 
           <div className="p-2 border-t border-gray-200 bg-white">
             <div className="flex justify-end font-semibold text-md mb-3">
               <span className="text-gray-700 me-2">Sub-Total:</span>
