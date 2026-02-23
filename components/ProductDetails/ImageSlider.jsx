@@ -7,14 +7,9 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-const images = [
-  "/images/001jpeg.jpeg",
-  "/images/012.jpg",
-  "/images/001jpeg.jpeg",
-  "/images/012.jpg",
-];
 
-const ImageSlider = () => {
+
+const ImageSlider = ({ images }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -56,11 +51,10 @@ const ImageSlider = () => {
         {/* Prev Arrow */}
         <button
           disabled={isBeginning}
-          className={`custom-prev absolute -left-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${
-            isBeginning
-              ? "cursor-not-allowed opacity-50"
-              : "hover:bg-gray-100 hover:cursor-pointer"
-          }`}
+          className={`custom-prev absolute -left-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${isBeginning
+            ? "cursor-not-allowed opacity-50"
+            : "hover:bg-gray-100 hover:cursor-pointer"
+            }`}
         >
           <IoIosArrowBack />
         </button>
@@ -92,11 +86,10 @@ const ImageSlider = () => {
         {/* Next Arrow */}
         <button
           disabled={isEnd}
-          className={`custom-next absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${
-            isEnd
-              ? "cursor-not-allowed opacity-50"
-              : "hover:bg-gray-100 hover:cursor-pointer"
-          }`}
+          className={`custom-next absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-2xl p-2 rounded-full ${isEnd
+            ? "cursor-not-allowed opacity-50"
+            : "hover:bg-gray-100 hover:cursor-pointer"
+            }`}
         >
           <IoIosArrowForward />
         </button>

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-const ColorFamily = () => {
+const ColorFamily = ({ attributes }) => {
+  console.log(attributes);
+
   const colors = ["red", "blue", "green", "yellow", "black", "white"];
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   return (
@@ -24,9 +26,8 @@ const ColorFamily = () => {
               />
               <label
                 htmlFor={`color_${index}`}
-                className={`flex flex-col p-1 border border-gray-800 cursor-pointer h-8 w-8 ${
-                  selectedColor === color ? "ring-1 ring-black" : ""
-                }`}
+                className={`flex flex-col p-1 border border-gray-800 cursor-pointer h-8 w-8 ${selectedColor === color ? "ring-1 ring-black" : ""
+                  }`}
                 style={{ backgroundColor: color }}
               ></label>
             </div>

@@ -1,87 +1,132 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { CiHeart } from "react-icons/ci";
-import { HiOutlineMinusSm, HiOutlinePlus, HiOutlineStar } from "react-icons/hi";
+import { HiOutlineMinusSm, HiOutlinePlus } from "react-icons/hi";
 import { IoShareSocialSharp } from "react-icons/io5";
-import ColorFamily from "./ColorFamily";
-import VariableName from "./VariableName";
-const Details = () => {
+import { addToCart } from "@/utils/cart";
+import ProductDescription from "./ProductDescription";
+import VariantSelector from "./VariantSelector";
+
+const Details = ({ product }) => {
+  const availableVariants = useMemo(
+    () => product.variants.filter((v) => v.availability === true),
+    [product.variants]
+  );
+
+  const [selectedVariant, setSelectedVariant] = useState(availableVariants[0]);
+  const [quantity, setQuantity] = useState(1);
+
+  if (!selectedVariant) return null;
+
+  const maxStock = Math.max(1, selectedVariant.stock || 1);
+  const currentPrice = selectedVariant.discountPrice || selectedVariant.price;
+
+  const handleBuyNow = () => {
+    console.log("PRODUCT ID:", product._id);
+    console.log("VARIANT ID:", selectedVariant._id);
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: `${product._id}-${selectedVariant._id || "default"}`,
+      productId: product._id,
+      variantId: selectedVariant._id || "default",
+      name: product.productName,
+      color:
+        selectedVariant.attributes?.Color ||
+        selectedVariant.attributes?.color ||
+        "",
+      size:
+        selectedVariant.attributes?.Size ||
+        selectedVariant.attributes?.size ||
+        "",
+      unitPrice: currentPrice,
+      quantity,
+      image: product?.images?.[0] || "/images/001.jpg",
+    });
+  };
+
   return (
     <div className="p-2">
-      <h1 className="font-medium text-xl">
-        Powerful Handheld Massage Gun for Deep Tissue Relief - Compact & Elegant
-        Design
-      </h1>
-      {/* rating */}
-      <div className="flex items-center text-[14px] mt-2">
-        <span className="text-orange-500 inline-flex items-center">
-          <HiOutlineStar />
-          <HiOutlineStar />
-          <HiOutlineStar />
-          <HiOutlineStar />
-          <HiOutlineStar />
-        </span>
-        <span className="text-blue-600 text-[12px] ml-2">(100 reviews)</span>
-      </div>
-      {/* Price and discountprice*/}
+      <h1 className="text-xl font-medium">{product.productName}</h1>
+
       <div className="mt-2 flex items-center justify-between">
-        <div className="">
-          <span className="text-2xl font-bold  text-[#ff3300]">৳ 2,500</span>
-          <span className="text-sm text-gray-500 line-through ml-2 font-bold">
-            ৳ 3,000
-          </span>
+        <div>
+          <span className="text-2xl font-bold text-[#ff3300]">৳ {currentPrice}</span>
+
+          {selectedVariant.discountPrice && (
+            <span className="ml-2 text-sm font-bold text-gray-500 line-through">
+              ৳ {selectedVariant.price}
+            </span>
+          )}
         </div>
-        <div className="text-gray-500 cursor-pointer">
-          <IoShareSocialSharp size={24} />
-        </div>
+
+        <IoShareSocialSharp size={24} className="cursor-pointer text-gray-500" />
       </div>
-      {/* stock */}
+
       <div className="mt-2 flex items-center justify-between">
-        <div className="">
-          <p className="font-medium text-[#669900] ">In Stock</p>
+        <div>
+          <p className="font-medium text-[#669900]">In Stock</p>
           <p className="text-[14px]">
-            Only <b>70</b> left
+            Only <b>{selectedVariant.stock}</b> left
           </p>
         </div>
-        <div className="pt-2 flex justify-center">
-          <img src="/images/cartout.png" alt="WGP logo" className="w-30" />
-        </div>
+        <img src="/images/cartout.png" alt="logo" className="w-30" />
       </div>
-      {/* short description */}
-      <ul className="mt-4 list-disc list-inside text-black">
-        <li className="">Ulanzi MT-11 Durable Tripod</li>
-        <li>Ulanzi MT-11 Durable Tripod</li>
-        <li>Ulanzi MT-11 Durable Tripod</li>
-        <li>Ulanzi MT-11 Durable Tripod</li>
-        <li>Ulanzi MT-11 Durable Tripod</li>
-        <li>Ulanzi MT-11 Durable Tripod</li>
-      </ul>
-      {/* color and variant select radio  */}
-      <ColorFamily />
-      {/* size */}
-      <VariableName />
 
-      {/* quantity */}
+      <ProductDescription html={product.shortDescription} />
+
+      {product.variants.some(
+        (v) => v.attributes && Object.keys(v.attributes).length > 0
+      ) && (
+        <VariantSelector
+          variants={availableVariants}
+          selectedVariant={selectedVariant}
+          setSelectedVariant={(variant) => {
+            setSelectedVariant(variant);
+            setQuantity(1);
+          }}
+        />
+      )}
+
       <div className="mt-4 flex items-center gap-2">
-        <label className="block text-gray-700 mb-2">Quantity:</label>
-        <button className="cursor-pointer bg-gray-200 p-1">
+        <label className="text-gray-700">Quantity:</label>
+        <button
+          className="bg-gray-200 p-1"
+          type="button"
+          onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+        >
           <HiOutlineMinusSm size={20} />
         </button>
-        <span>1</span>
-
-        <button className="cursor-pointer bg-gray-200 p-1">
+        <span>{quantity}</span>
+        <button
+          className="bg-gray-200 p-1"
+          type="button"
+          onClick={() => setQuantity((prev) => Math.min(maxStock, prev + 1))}
+        >
           <HiOutlinePlus />
         </button>
       </div>
-      {/* Add to cart and by now button */}
-      <div className="mt-4 flex items-center gap-2 md:w-[80%] w-full">
-        <button className="bg-amber-400 px-4 py-2 rounded hover:bg-white border border-amber-400 transition duration-200 cursor-pointer w-[40%]">
+
+      <div className="mt-4 flex w-full items-center gap-2 md:w-[80%]">
+        <button
+          onClick={handleBuyNow}
+          className="w-[40%] rounded bg-amber-400 px-4 py-2"
+          type="button"
+        >
           Buy Now
         </button>
-        <button className="bg-[#ff3300] text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200 cursor-pointer w-[40%]">
+
+        <button
+          onClick={handleAddToCart}
+          className="w-[40%] rounded bg-[#ff3300] px-4 py-2 text-white"
+          type="button"
+        >
           Add to Cart
         </button>
-        <div className="cursor-pointer">
-          <CiHeart size={35} />
-        </div>
+
+        <CiHeart size={35} className="cursor-pointer" />
       </div>
     </div>
   );
