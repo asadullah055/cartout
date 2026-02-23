@@ -3,7 +3,7 @@ import Image from "next/image";
 import ShowBanner from "./ShowBanner";
 
 async function getBanners() {
-  const res = await fetch("https://pinwheel-server.vercel.app/api/banner/get-active-banner", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/banner/get-active-banner`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch banners");

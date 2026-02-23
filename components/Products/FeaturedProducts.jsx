@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard";
 async function getProducts() {
-  const res = await fetch("http://localhost:8000/api/product/publicProducts", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/publicProducts`, {
     cache: "no-store",
   });
   const data = await res.json();
