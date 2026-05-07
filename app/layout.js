@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer/Footer";
 import Headers from "@/components/Header/Header";
+import ToastProvider from "@/components/ToastProvider";
 import { Inter, Nunito_Sans, Work_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
 
         {children}
         <Footer />
+        <ToastProvider />
       </body>
     </html>
   );

@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { addToCart } from "@/utils/cart";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { addToCart, writeBuyNowItem } from "@/utils/cart";
 
 const ProductCard = ({ product }) => {
+  const router = useRouter();
   const availableVariants =
     product?.variants?.filter((v) => v.availability === true) || [];
 
@@ -20,18 +23,26 @@ const ProductCard = ({ product }) => {
 
   const unitPrice = variant.discountPrice || variant.price;
 
+  const getCartItem = () => ({
+    id: `${product._id}-${variant._id || "default"}`,
+    productId: product._id,
+    variantId: variant._id || "default",
+    name: product.productName,
+    color: variant.attributes?.Color || variant.attributes?.color || "",
+    size: variant.attributes?.Size || variant.attributes?.size || "",
+    unitPrice,
+    quantity: 1,
+    image: product?.images?.[0] || "/images/001.jpg",
+  });
+
   const handleAddToCart = () => {
-    addToCart({
-      id: `${product._id}-${variant._id || "default"}`,
-      productId: product._id,
-      variantId: variant._id || "default",
-      name: product.productName,
-      color: variant.attributes?.Color || variant.attributes?.color || "",
-      size: variant.attributes?.Size || variant.attributes?.size || "",
-      unitPrice,
-      quantity: 1,
-      image: product?.images?.[0] || "/images/001.jpg",
-    });
+    addToCart(getCartItem());
+    toast.success("Product added to cart");
+  };
+
+  const handleBuyNow = () => {
+    writeBuyNowItem(getCartItem());
+    router.push("/checkout?buyNow=1");
   };
 
   return (
@@ -70,7 +81,11 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className="mt-2 flex justify-between gap-1 sm:gap-2">
-        <button className="rounded bg-[#ff3300] px-2 py-1 text-[10px] font-bold text-white md:text-[12px]" type="button">
+        <button
+          className="rounded bg-[#ff3300] px-2 py-1 text-[10px] font-bold text-white md:text-[12px]"
+          type="button"
+          onClick={handleBuyNow}
+        >
           BUY NOW
         </button>
         <button

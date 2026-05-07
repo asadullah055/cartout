@@ -1,14 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { CiHeart } from "react-icons/ci";
 import { HiOutlineMinusSm, HiOutlinePlus } from "react-icons/hi";
 import { IoShareSocialSharp } from "react-icons/io5";
-import { addToCart } from "@/utils/cart";
+import { addToCart, writeBuyNowItem } from "@/utils/cart";
 import ProductDescription from "./ProductDescription";
 import VariantSelector from "./VariantSelector";
 
 const Details = ({ product }) => {
+  const router = useRouter();
   const availableVariants = useMemo(
     () => product.variants.filter((v) => v.availability === true),
     [product.variants]
@@ -22,29 +25,32 @@ const Details = ({ product }) => {
   const maxStock = Math.max(1, selectedVariant.stock || 1);
   const currentPrice = selectedVariant.discountPrice || selectedVariant.price;
 
+  const getCartItem = () => ({
+    id: `${product._id}-${selectedVariant._id || "default"}`,
+    productId: product._id,
+    variantId: selectedVariant._id || "default",
+    name: product.productName,
+    color:
+      selectedVariant.attributes?.Color ||
+      selectedVariant.attributes?.color ||
+      "",
+    size:
+      selectedVariant.attributes?.Size ||
+      selectedVariant.attributes?.size ||
+      "",
+    unitPrice: currentPrice,
+    quantity,
+    image: product?.images?.[0] || "/images/001.jpg",
+  });
+
   const handleBuyNow = () => {
-    console.log("PRODUCT ID:", product._id);
-    console.log("VARIANT ID:", selectedVariant._id);
+    writeBuyNowItem(getCartItem());
+    router.push("/checkout?buyNow=1");
   };
 
   const handleAddToCart = () => {
-    addToCart({
-      id: `${product._id}-${selectedVariant._id || "default"}`,
-      productId: product._id,
-      variantId: selectedVariant._id || "default",
-      name: product.productName,
-      color:
-        selectedVariant.attributes?.Color ||
-        selectedVariant.attributes?.color ||
-        "",
-      size:
-        selectedVariant.attributes?.Size ||
-        selectedVariant.attributes?.size ||
-        "",
-      unitPrice: currentPrice,
-      quantity,
-      image: product?.images?.[0] || "/images/001.jpg",
-    });
+    addToCart(getCartItem());
+    toast.success("Product added to cart");
   };
 
   return (

@@ -1,22 +1,40 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AddAddress from "@/components/checkout/AddAddress";
 import CheckoutOrderItems from "@/components/checkout/CheckoutOrderItems";
 import CheckoutSidebar from "@/components/checkout/CheckoutSidebar";
 import DeliveryAddressSection from "@/components/checkout/DeliveryAddressSection";
-import { cartEventName, readCart, writeCart } from "@/utils/cart";
+import {
+  cartEventName,
+  clearBuyNowItem,
+  readBuyNowItem,
+  readCart,
+  writeCart,
+} from "@/utils/cart";
 
 const CheckOutPage = () => {
+  const router = useRouter();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [isBuyNowCheckout, setIsBuyNowCheckout] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderFeedback, setOrderFeedback] = useState("");
 
   useEffect(() => {
-    setCartItems(readCart());
+    const searchParams = new URLSearchParams(window.location.search);
+    const shouldUseBuyNow = searchParams.get("buyNow") === "1";
+    const buyNowItem = shouldUseBuyNow ? readBuyNowItem() : null;
 
-    const syncCart = () => setCartItems(readCart());
+    setIsBuyNowCheckout(Boolean(buyNowItem));
+    setCartItems(buyNowItem ? [buyNowItem] : readCart());
+
+    const syncCart = () => {
+      if (!shouldUseBuyNow) {
+        setCartItems(readCart());
+      }
+    };
     window.addEventListener(cartEventName, syncCart);
     window.addEventListener("storage", syncCart);
 
@@ -54,6 +72,7 @@ const CheckOutPage = () => {
           product: item.productId,
           quantity: item.quantity,
         })),
+        shippingFee,
         shippingAddress: {
           street: "Rohanpur",
           city: "Chapainawabganj",
@@ -84,9 +103,23 @@ const CheckOutPage = () => {
         throw new Error(data?.message || "Failed to place order");
       }
 
-      writeCart([]);
+      if (isBuyNowCheckout) {
+        clearBuyNowItem();
+      } else {
+        writeCart([]);
+      }
       setCartItems([]);
-      setOrderFeedback("Order placed successfully.");
+      window.sessionStorage.setItem(
+        "pinwheel_last_order",
+        JSON.stringify({
+          order: data?.order,
+          orderedItems: cartItems,
+          subtotal,
+          shippingFee,
+          totalItems,
+        })
+      );
+      router.push("/order-success");
     } catch (error) {
       setOrderFeedback(error.message || "Failed to place order");
     } finally {

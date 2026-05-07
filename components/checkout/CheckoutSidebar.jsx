@@ -46,7 +46,7 @@ const CheckoutSidebar = ({
           </div>
 
           <div className="rounded-md p-3 sm:p-4">
-            <p className="text-[16px] font-medium text-primaryBlackText">Have a Cartup Coupon?</p>
+            <p className="text-[16px] font-medium text-primaryBlackText">Have a Cartout Coupon?</p>
 
             <form className="mt-3 flex items-center gap-2">
               <input
@@ -58,7 +58,7 @@ const CheckoutSidebar = ({
               />
               <button
                 aria-label="Apply"
-                className="h-[40px] rounded-md bg-[#C3007A] px-6 text-sm font-semibold text-white"
+                className="h-[40px] rounded-md bg-[#ff3300] px-6 text-sm font-semibold text-white transition duration-200 hover:bg-orange-600"
                 type="button"
               >
                 Apply
@@ -96,13 +96,13 @@ const CheckoutSidebar = ({
                 <Link className="text-[#175CD3] no-underline" href="/content/returns-and-refunds">
                   Return &amp; Refund Policy
                 </Link>{" "}
-                of Cartup
+                of Cartout
               </p>
             </div>
 
             <button
               aria-label="Place Order"
-              className="mt-4 h-[42px] w-full rounded-full bg-gradient-to-r from-[#7A3E97] to-[#E00087] text-base font-semibold text-white"
+              className="mt-4 h-[42px] w-full rounded-full bg-[#ff3300] text-base font-semibold text-white transition duration-200 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
               type="button"
               onClick={onPlaceOrder}
               disabled={!totalItems || isPlacingOrder}

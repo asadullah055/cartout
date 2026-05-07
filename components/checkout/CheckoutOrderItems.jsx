@@ -71,7 +71,7 @@ const CheckoutOrderItems = ({ cartItems }) => {
             <div className="flex gap-4">
               <div className="flex items-center gap-1 text-primaryBlackText hover:text-highlight">
                 <Link className="text-sm font-semibold" href="#">
-                  Cartup Retail
+                  Cartout Retail
                 </Link>
                 <IoIosArrowForward />
               </div>

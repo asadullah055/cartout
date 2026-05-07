@@ -24,7 +24,7 @@ const DeliveryInfo = () => {
         <div className="flex items-start gap-x-4 mt-3 ">
           <BsTruck size={24} className="text-gray-800" />
           <div>
-            <p>Standard Delivery</p>
+            <p>Delivery Timeline</p>
             <p className="text-xs text-gray-500">Get by 29 Jul - 3 Aug</p>
           </div>
           <div className="ml-auto font-semibold">৳ 150</div>
@@ -43,7 +43,7 @@ const DeliveryInfo = () => {
         </h2>
         <div className="flex items-center gap-x-4">
           <IoIosSync size={24} className="text-gray-800" />
-          <p>14 days easy return</p>
+          <p>3 days easy return</p>
         </div>
         <div className="flex items-center gap-x-4 mt-2">
           <GoShieldCheck size={24} className="text-gray-800" />

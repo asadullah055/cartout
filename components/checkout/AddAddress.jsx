@@ -18,7 +18,7 @@ const AddAddress = ({ isOpen, onClose }) => {
       >
         <div className="border-b border-[#EAECF0] px-4 py-4 md:px-6">
           <div className="relative flex items-center justify-center">
-            <h2 className="text-xl font-medium text-[#1D2939]">Add Delivery Address</h2>
+            <h2 className="text-lg font-semibold text-[#1D2939] md:text-xl">Add Delivery Address</h2>
             <button
               aria-label="Close"
               className="absolute right-0 top-1/2 -translate-y-1/2 text-[#667085]"
@@ -32,7 +32,7 @@ const AddAddress = ({ isOpen, onClose }) => {
 
         <div className="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 md:gap-8 md:p-6">
           <div>
-            <h3 className="mb-4 text-3xl font-medium text-[#101828]">Contact Information</h3>
+            <h3 className="mb-4 text-lg font-semibold text-[#101828]">Contact Information</h3>
 
             <label className="mb-2 block text-sm font-semibold text-[#344054]">
               Contact Name <span className="text-[#F04438]">*</span>
@@ -67,18 +67,18 @@ const AddAddress = ({ isOpen, onClose }) => {
               type="email"
             />
 
-            <h3 className="mb-2 text-3xl font-medium text-[#101828]">Address Category</h3>
+            <h3 className="mb-2 text-lg font-semibold text-[#101828]">Address Category</h3>
             <p className="mb-3 text-sm font-medium text-[#344054]">
               Select label for effective delivery <span className="text-[#F04438]">*</span>
             </p>
 
             <div className="mb-4 flex flex-wrap gap-3">
               <button
-                className="flex h-[48px] min-w-[108px] items-center justify-between rounded border border-[#FF0A81] px-4 text-lg font-semibold text-[#404040]"
+                className="flex h-[44px] min-w-[108px] items-center justify-between rounded border border-[#ff3300] px-4 text-sm font-semibold text-[#404040]"
                 type="button"
               >
                 Home
-                <span className="ml-3 flex h-6 w-6 items-center justify-center rounded border border-[#7F56D9] text-sm text-[#7F56D9]">
+                <span className="ml-3 flex h-6 w-6 items-center justify-center rounded border border-[#ff3300] text-sm text-[#ff3300]">
                   <svg
                     width="12"
                     height="12"
@@ -88,7 +88,7 @@ const AddAddress = ({ isOpen, onClose }) => {
                   >
                     <path
                       d="M9.5 3.5L4.75 8.25L2.5 6"
-                      stroke="#7F56D9"
+                      stroke="#ff3300"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -97,14 +97,14 @@ const AddAddress = ({ isOpen, onClose }) => {
                 </span>
               </button>
               <button
-                className="flex h-[48px] min-w-[108px] items-center justify-between rounded border border-[#D0D5DD] px-4 text-lg font-semibold text-[#404040]"
+                className="flex h-[44px] min-w-[108px] items-center justify-between rounded border border-[#D0D5DD] px-4 text-sm font-semibold text-[#404040]"
                 type="button"
               >
                 Office
                 <span className="ml-3 h-6 w-6 rounded border border-[#D0D5DD]"></span>
               </button>
               <button
-                className="flex h-[48px] min-w-[108px] items-center justify-between rounded border border-[#D0D5DD] px-4 text-lg font-semibold text-[#404040]"
+                className="flex h-[44px] min-w-[108px] items-center justify-between rounded border border-[#D0D5DD] px-4 text-sm font-semibold text-[#404040]"
                 type="button"
               >
                 Others
@@ -112,14 +112,14 @@ const AddAddress = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            <label className="flex items-center gap-3 text-lg text-[#1D2939]">
+            <label className="flex items-center gap-3 text-sm font-medium text-[#1D2939]">
               <span className="h-6 w-6 rounded border border-[#D0D5DD]"></span>
               Default Delivery address
             </label>
           </div>
 
           <div>
-            <h3 className="mb-4 text-3xl font-medium text-[#101828]">Address Information</h3>
+            <h3 className="mb-4 text-lg font-semibold text-[#101828]">Address Information</h3>
 
             <label className="mb-2 block text-sm font-semibold text-[#344054]">
               Street , House/Apartment/Unit <span className="text-[#F04438]">*</span>
@@ -160,7 +160,7 @@ const AddAddress = ({ isOpen, onClose }) => {
 
             <div className="flex justify-end">
               <button
-                className="h-[52px] w-[180px] rounded-full bg-gradient-to-r from-[#7A3E97] to-[#E00087] text-lg font-semibold text-white"
+                className="h-[44px] w-[160px] rounded-full bg-[#ff3300] text-sm font-semibold text-white transition duration-200 hover:bg-orange-600"
                 type="button"
               >
                 Save

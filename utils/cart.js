@@ -1,4 +1,5 @@
 const CART_STORAGE_KEY = "pinwheel_cart";
+const BUY_NOW_STORAGE_KEY = "pinwheel_buy_now";
 const CART_EVENT_NAME = "cart:updated";
 
 const isBrowser = () => typeof window !== "undefined";
@@ -59,6 +60,31 @@ export const removeCartItem = (id) => {
   const items = readCart().filter((item) => item.id !== id);
   writeCart(items);
   return items;
+};
+
+export const readBuyNowItem = () => {
+  if (!isBrowser()) return null;
+
+  try {
+    const raw = window.localStorage.getItem(BUY_NOW_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+export const writeBuyNowItem = (item) => {
+  if (!isBrowser()) return;
+
+  window.localStorage.setItem(BUY_NOW_STORAGE_KEY, JSON.stringify(item));
+};
+
+export const clearBuyNowItem = () => {
+  if (!isBrowser()) return;
+
+  window.localStorage.removeItem(BUY_NOW_STORAGE_KEY);
 };
 
 export const cartEventName = CART_EVENT_NAME;
