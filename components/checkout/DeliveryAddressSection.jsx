@@ -1,7 +1,14 @@
 import Address from "@/components/checkout/Address";
 import { GoPlus } from "react-icons/go";
 
-const DeliveryAddressSection = ({ onAddAddressClick }) => {
+const DeliveryAddressSection = ({
+  addresses,
+  selectedAddressId,
+  onAddAddressClick,
+  onSelectAddress,
+  onDeleteAddress,
+  onEditAddress,
+}) => {
   return (
     <div className="mb-[8px] bg-white p-4 md:mb-[16px] md:rounded-md md:p-6 mt-3">
       <div className="mt-0">
@@ -18,7 +25,13 @@ const DeliveryAddressSection = ({ onAddAddressClick }) => {
             <span>Add Address</span>
           </button>
         </div>
-        <Address />
+        <Address
+          addresses={addresses}
+          selectedAddressId={selectedAddressId}
+          onSelectAddress={onSelectAddress}
+          onDeleteAddress={onDeleteAddress}
+          onEditAddress={onEditAddress}
+        />
       </div>
     </div>
   );

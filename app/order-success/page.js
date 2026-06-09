@@ -17,6 +17,33 @@ const formatDate = (value) => {
   }).format(new Date(value));
 };
 
+const formatDeliveryAddress = (address) => {
+  if (!address) return "Address not available";
+
+  if (address.division || address.district || address.upazila || address.area) {
+    return [
+      address.street,
+      address.area,
+      address.upazila,
+      address.district,
+      address.division,
+      address.country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return [
+    address.street,
+    address.city,
+    address.state,
+    address.postalCode,
+    address.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+};
+
 const OrderSuccessPage = () => {
   const [orderData, setOrderData] = useState(null);
 
@@ -30,7 +57,7 @@ const OrderSuccessPage = () => {
   }, []);
 
   const order = orderData?.order;
-  const fallbackItems = orderData?.orderedItems || [];
+  const fallbackItems = useMemo(() => orderData?.orderedItems || [], [orderData?.orderedItems]);
   const orderItems = order?.items?.length ? order.items : fallbackItems;
 
   const subtotal = useMemo(() => {
@@ -162,11 +189,7 @@ const OrderSuccessPage = () => {
 
             <div className="mt-5 rounded bg-gray-50 p-3 text-sm text-gray-700">
               <p className="font-semibold text-gray-900">Delivery Address</p>
-              <p className="mt-1">
-                {order?.shippingAddress
-                  ? `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.postalCode}, ${order.shippingAddress.country}`
-                  : "Address not available"}
-              </p>
+              <p className="mt-1">{formatDeliveryAddress(order?.shippingAddress)}</p>
             </div>
 
             <Link

@@ -21,7 +21,7 @@ async function getProduct(slug) {
 }
 
 const ProductDetails = async ({ params }) => {
-  const { slug } = params; // ✅ server side params
+  const { slug } = await params; // ✅ server side params
   const {product} = await getProduct(slug);
 
   return (

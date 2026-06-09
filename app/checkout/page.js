@@ -14,10 +14,15 @@ import {
   writeCart,
 } from "@/utils/cart";
 
+const ADDRESS_STORAGE_KEY = "pinwheel_delivery_addresses";
+
 const CheckOutPage = () => {
   const router = useRouter();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [editingAddressId, setEditingAddressId] = useState("");
   const [isBuyNowCheckout, setIsBuyNowCheckout] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderFeedback, setOrderFeedback] = useState("");
@@ -29,6 +34,24 @@ const CheckOutPage = () => {
 
     setIsBuyNowCheckout(Boolean(buyNowItem));
     setCartItems(buyNowItem ? [buyNowItem] : readCart());
+
+    try {
+      const savedAddresses = JSON.parse(
+        window.localStorage.getItem(ADDRESS_STORAGE_KEY) || "[]"
+      );
+
+      if (Array.isArray(savedAddresses)) {
+        setAddresses(savedAddresses);
+        setSelectedAddressId(
+          savedAddresses.find((address) => address.isDefault)?.id ||
+            savedAddresses[0]?.id ||
+            ""
+        );
+      }
+    } catch {
+      setAddresses([]);
+      setSelectedAddressId("");
+    }
 
     const syncCart = () => {
       if (!shouldUseBuyNow) {
@@ -53,9 +76,108 @@ const CheckOutPage = () => {
     [cartItems]
   );
   const shippingFee = totalItems > 0 ? 140 : 0;
+  const selectedAddress = useMemo(
+    () => addresses.find((address) => address.id === selectedAddressId),
+    [addresses, selectedAddressId]
+  );
+  const editingAddress = useMemo(
+    () => addresses.find((address) => address.id === editingAddressId) || null,
+    [addresses, editingAddressId]
+  );
+
+  const persistAddresses = (nextAddresses) => {
+    window.localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(nextAddresses));
+  };
+
+  const handleSaveAddress = (address) => {
+    setAddresses((currentAddresses) => {
+      const isExistingAddress = currentAddresses.some(
+        (currentAddress) => currentAddress.id === address.id
+      );
+      const shouldSetDefault = address.isDefault || currentAddresses.length === 0;
+      let nextAddresses = isExistingAddress
+        ? currentAddresses.map((currentAddress) => {
+            if (currentAddress.id === address.id) {
+              return {
+                ...address,
+                isDefault: shouldSetDefault,
+              };
+            }
+
+            return {
+              ...currentAddress,
+              isDefault: shouldSetDefault ? false : currentAddress.isDefault,
+            };
+          })
+        : [
+            ...currentAddresses.map((currentAddress) => ({
+              ...currentAddress,
+              isDefault: shouldSetDefault ? false : currentAddress.isDefault,
+            })),
+            {
+              ...address,
+              isDefault: shouldSetDefault,
+            },
+          ];
+
+      if (nextAddresses.length && !nextAddresses.some((nextAddress) => nextAddress.isDefault)) {
+        nextAddresses = nextAddresses.map((nextAddress, index) => ({
+          ...nextAddress,
+          isDefault: index === 0,
+        }));
+      }
+
+      persistAddresses(nextAddresses);
+      return nextAddresses;
+    });
+    setSelectedAddressId(address.id);
+    setEditingAddressId("");
+    setIsAddressModalOpen(false);
+  };
+
+  const handleAddAddressClick = () => {
+    setEditingAddressId("");
+    setIsAddressModalOpen(true);
+  };
+
+  const handleEditAddress = (addressId) => {
+    setEditingAddressId(addressId);
+    setIsAddressModalOpen(true);
+  };
+
+  const handleCloseAddressModal = () => {
+    setEditingAddressId("");
+    setIsAddressModalOpen(false);
+  };
+
+  const handleDeleteAddress = (addressId) => {
+    setAddresses((currentAddresses) => {
+      const nextAddresses = currentAddresses.filter((address) => address.id !== addressId);
+      const normalizedAddresses =
+        nextAddresses.length && !nextAddresses.some((address) => address.isDefault)
+          ? nextAddresses.map((address, index) => ({
+              ...address,
+              isDefault: index === 0,
+            }))
+          : nextAddresses;
+
+      persistAddresses(normalizedAddresses);
+
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId(normalizedAddresses[0]?.id || "");
+      }
+
+      return normalizedAddresses;
+    });
+  };
 
   const handlePlaceOrder = async () => {
     if (!cartItems.length || isPlacingOrder) return;
+
+    if (!selectedAddress) {
+      setOrderFeedback("Please add and select a delivery address.");
+      return;
+    }
 
     const hasInvalidItems = cartItems.some((item) => !item.productId);
     if (hasInvalidItems) {
@@ -67,24 +189,22 @@ const CheckOutPage = () => {
     setOrderFeedback("");
 
     try {
+      const customerPhone = selectedAddress.mobileNumber.startsWith("0")
+        ? selectedAddress.mobileNumber
+        : `0${selectedAddress.mobileNumber}`;
       const payload = {
         items: cartItems.map((item) => ({
           product: item.productId,
+          variant: item.variantId,
           quantity: item.quantity,
         })),
         shippingFee,
-        shippingAddress: {
-          street: "Rohanpur",
-          city: "Chapainawabganj",
-          state: "Rajshahi",
-          postalCode: "6320",
-          country: "Bangladesh",
-        },
+        shippingAddress: selectedAddress.shippingAddress,
         paymentMethod: "Cash on Delivery",
         customer: {
-          name: "Guest Customer",
-          phone: "01700000000",
-          email: null,
+          name: selectedAddress.contactName,
+          phone: customerPhone,
+          email: selectedAddress.email || null,
         },
       };
 
@@ -132,7 +252,14 @@ const CheckOutPage = () => {
       <div className="mx-auto max-w-[1280px]">
         <div className="flex flex-col p-0 lg:flex-row xl:gap-[16px]">
           <div className="w-full">
-            <DeliveryAddressSection onAddAddressClick={() => setIsAddressModalOpen(true)} />
+            <DeliveryAddressSection
+              addresses={addresses}
+              selectedAddressId={selectedAddressId}
+              onAddAddressClick={handleAddAddressClick}
+              onSelectAddress={setSelectedAddressId}
+              onDeleteAddress={handleDeleteAddress}
+              onEditAddress={handleEditAddress}
+            />
             <CheckoutOrderItems cartItems={cartItems} />
           </div>
           <CheckoutSidebar
@@ -145,7 +272,12 @@ const CheckOutPage = () => {
           />
         </div>
       </div>
-      <AddAddress isOpen={isAddressModalOpen} onClose={() => setIsAddressModalOpen(false)} />
+      <AddAddress
+        isOpen={isAddressModalOpen}
+        onClose={handleCloseAddressModal}
+        onSave={handleSaveAddress}
+        editingAddress={editingAddress}
+      />
     </div>
   );
 };
