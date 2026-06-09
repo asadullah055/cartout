@@ -47,8 +47,8 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="mt-2 w-full rounded-md bg-white p-3 hover:shadow-md">
-      <Link target="_blank" href={`/product/${product.slug}`}>
-        <div className="relative">
+      <Link href={`/product/${product.slug}`}>
+        <div className="relative overflow-hidden rounded-md border border-gray-100 bg-gray-50 p-2 transition duration-200 hover:border-orange-100">
           {discount && (
             <span className="absolute right-1 top-1 rounded bg-red-600 px-2 py-0.5 text-xs text-white">
               -{discount}%
@@ -82,14 +82,14 @@ const ProductCard = ({ product }) => {
 
       <div className="mt-2 flex justify-between gap-1 sm:gap-2">
         <button
-          className="rounded bg-[#ff3300] px-2 py-1 text-[10px] font-bold text-white md:text-[12px]"
+          className="rounded bg-[#ff3300] px-2 py-1 text-[10px] font-bold text-white md:text-[12px] transition duration-200 hover:bg-orange-600 cursor-pointer"
           type="button"
           onClick={handleBuyNow}
         >
           BUY NOW
         </button>
         <button
-          className="rounded border border-orange-600 px-2 py-1 text-[10px] font-bold text-orange-500 md:text-[12px]"
+          className="rounded border border-orange-600 px-2 py-1 text-[10px] font-bold text-orange-500 md:text-[12px] transition duration-200 hover:bg-orange-50 cursor-pointer"
           type="button"
           onClick={handleAddToCart}
         >

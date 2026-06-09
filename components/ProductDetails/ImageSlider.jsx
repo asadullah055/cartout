@@ -1,19 +1,60 @@
 "use client";
 import { useRef, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import ReactImageZoom from "react-image-zoom";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 
+const ZOOM_PREVIEW_WIDTH = 620;
+const ZOOM_PREVIEW_HEIGHT = 480;
 
 const ImageSlider = ({ images }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomStyle, setZoomStyle] = useState({
+    backgroundPosition: "center",
+    backgroundSize: "240%",
+  });
+  const imageRef = useRef(null);
   const swiperRef = useRef(null);
+
+  const handleMouseMove = (event) => {
+    if (!imageRef.current) return;
+
+    const imageRect = imageRef.current.getBoundingClientRect();
+    const x = Math.min(
+      imageRect.width,
+      Math.max(0, event.clientX - imageRect.left)
+    );
+    const y = Math.min(
+      imageRect.height,
+      Math.max(0, event.clientY - imageRect.top)
+    );
+    const scale = Math.max(
+      2.4,
+      ZOOM_PREVIEW_WIDTH / imageRect.width + 0.15,
+      ZOOM_PREVIEW_HEIGHT / imageRect.height + 0.15
+    );
+    const backgroundWidth = imageRect.width * scale;
+    const backgroundHeight = imageRect.height * scale;
+    const backgroundX = Math.min(
+      0,
+      Math.max(ZOOM_PREVIEW_WIDTH - backgroundWidth, ZOOM_PREVIEW_WIDTH / 2 - x * scale)
+    );
+    const backgroundY = Math.min(
+      0,
+      Math.max(ZOOM_PREVIEW_HEIGHT - backgroundHeight, ZOOM_PREVIEW_HEIGHT / 2 - y * scale)
+    );
+
+    setZoomStyle({
+      backgroundPosition: `${backgroundX}px ${backgroundY}px`,
+      backgroundSize: `${backgroundWidth}px ${backgroundHeight}px`,
+    });
+  };
 
   const handleSwiperInit = (swiper) => {
     swiperRef.current = swiper;
@@ -29,22 +70,33 @@ const ImageSlider = ({ images }) => {
     }
   };
 
-  const zoomProps = {
-    width: 500,
-    // height: 500,
-    // zoomWidth: 400,
-    img: images[selectedIndex],
-    zoomPosition: "original",
-  };
-
   return (
-    <div className="border overflow-hidden p-3">
-      {/* Main Image with Zoom */}
-      <div className="w-full h-[300px]  rounded overflow-hidden relative">
-        <div className="mx-auto w-[400px] h-[300px] flex items-center">
-          <ReactImageZoom {...zoomProps} />
-        </div>
+    <div className="relative z-20 overflow-visible rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+      {/* Main Image */}
+      <div
+        className="relative flex h-[380px] w-full cursor-crosshair items-center justify-center overflow-hidden rounded-md bg-gray-50 p-2"
+        onMouseEnter={() => setIsZooming(true)}
+        onMouseLeave={() => setIsZooming(false)}
+        onMouseMove={handleMouseMove}
+      >
+        <img
+          ref={imageRef}
+          src={images[selectedIndex]}
+          alt="Selected product"
+          className="max-h-full max-w-full object-contain"
+        />
       </div>
+
+      {isZooming && (
+        <div
+          className="pointer-events-none absolute left-[calc(100%+16px)] top-3 z-50 hidden h-[480px] w-[620px] rounded-md border border-gray-200 bg-white bg-no-repeat shadow-xl lg:block"
+          style={{
+            backgroundImage: `url(${images[selectedIndex]})`,
+            backgroundPosition: zoomStyle.backgroundPosition,
+            backgroundSize: zoomStyle.backgroundSize,
+          }}
+        />
+      )}
 
       {/* Thumbnail Slider */}
       <div className="relative mt-4">
@@ -77,7 +129,11 @@ const ImageSlider = ({ images }) => {
                 src={img}
                 alt={`Thumbnail ${index}`}
                 onClick={() => setSelectedIndex(index)}
-                className={`w-20 h-20 object-contain rounded cursor-pointer transition-all duration-300 `}
+                className={`h-20 w-20 cursor-pointer rounded-md border object-contain p-1 transition-all duration-300 ${
+                  selectedIndex === index
+                    ? "border-orange-500 shadow-sm"
+                    : "border-gray-200 hover:border-orange-200"
+                }`}
               />
             </SwiperSlide>
           ))}

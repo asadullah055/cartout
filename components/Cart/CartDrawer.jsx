@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  cartEventName,
+  readCart,
+  removeCartItem,
+  updateCartItemQuantity,
+} from "@/utils/cart";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -7,12 +13,6 @@ import { FaTrashAlt } from "react-icons/fa";
 import { GoHomeFill } from "react-icons/go";
 import { IoMdClose } from "react-icons/io";
 import { IoCartOutline } from "react-icons/io5";
-import {
-  cartEventName,
-  readCart,
-  removeCartItem,
-  updateCartItemQuantity,
-} from "@/utils/cart";
 
 export default function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);

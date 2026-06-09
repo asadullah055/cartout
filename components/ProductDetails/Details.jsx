@@ -118,7 +118,7 @@ const Details = ({ product }) => {
       <div className="mt-4 flex w-full items-center gap-2 md:w-[80%]">
         <button
           onClick={handleBuyNow}
-          className="w-[40%] rounded bg-amber-400 px-4 py-2"
+          className="w-[40%] rounded bg-amber-400 px-4 py-2 text-black transition duration-200 hover:bg-amber-500 cursor-pointer"
           type="button"
         >
           Buy Now
@@ -126,7 +126,7 @@ const Details = ({ product }) => {
 
         <button
           onClick={handleAddToCart}
-          className="w-[40%] rounded bg-[#ff3300] px-4 py-2 text-white"
+          className="w-[40%] rounded bg-[#ff3300] px-4 py-2 text-white transition duration-200 hover:bg-orange-600 cursor-pointer"
           type="button"
         >
           Add to Cart
