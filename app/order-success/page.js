@@ -131,7 +131,7 @@ const OrderSuccessPage = () => {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase text-gray-500">Status</p>
-            <p className="mt-1 font-semibold text-[#ff3300]">{order?.status || "Pending"}</p>
+            <p className="mt-1 font-semibold text-[#ff3300]">Product wise</p>
           </div>
         </div>
 
@@ -160,6 +160,9 @@ const OrderSuccessPage = () => {
                     <div className="min-w-0 flex-1">
                       <p className="line-clamp-2 text-sm font-semibold text-gray-900">{name}</p>
                       <p className="mt-1 text-sm text-gray-600">Quantity: {item.quantity}</p>
+                      <p className="mt-1 text-xs font-semibold text-[#ff3300]">
+                        Status: {item.status || order?.status || "Pending"}
+                      </p>
                       <p className="mt-1 text-sm font-semibold text-gray-900">Tk {price}</p>
                     </div>
                   </div>
