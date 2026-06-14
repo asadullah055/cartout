@@ -77,6 +77,15 @@ const OrderSuccessPage = () => {
   const totalItems =
     orderData?.totalItems ||
     orderItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  const invoiceUrl = useMemo(() => {
+    if (!order?._id || !process.env.NEXT_PUBLIC_API_URL) return "";
+
+    const token = order.invoiceAccessToken
+      ? `?token=${encodeURIComponent(order.invoiceAccessToken)}`
+      : "";
+
+    return `${process.env.NEXT_PUBLIC_API_URL}/order/${order._id}/invoice${token}`;
+  }, [order?._id, order?.invoiceAccessToken]);
 
   if (!orderData) {
     return (
@@ -201,6 +210,16 @@ const OrderSuccessPage = () => {
             >
               Continue Shopping
             </Link>
+            {invoiceUrl ? (
+              <a
+                href={invoiceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 block rounded border border-[#ff3300] px-5 py-2.5 text-center text-sm font-semibold text-[#ff3300] hover:bg-orange-50"
+              >
+                View Invoice
+              </a>
+            ) : null}
           </aside>
         </div>
       </section>
