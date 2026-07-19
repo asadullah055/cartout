@@ -57,7 +57,10 @@ const getDeliveryTimeline = () => {
   return `Get by ${formatDeliveryDate(startDate)} - ${formatDeliveryDate(endDate)}`;
 };
 
-const DeliveryInfo = () => {
+const isDhakaLocation = (location) =>
+  String(location?.district?.name || "").trim().toLowerCase() === "dhaka";
+
+const DeliveryInfo = ({ product }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(defaultLocation);
   const [selection, setSelection] = useState(emptySelection);
@@ -68,6 +71,11 @@ const DeliveryInfo = () => {
   const [isLoadingLocations, setIsLoadingLocations] = useState(false);
   const [locationError, setLocationError] = useState("");
   const deliveryTimeline = useMemo(() => getDeliveryTimeline(), []);
+  const insideDhakaShipping = Number(product?.shippingCharge?.insideDhaka ?? 80);
+  const outsideDhakaShipping = Number(product?.shippingCharge?.outsideDhaka ?? 120);
+  const selectedShippingFee = isDhakaLocation(selectedLocation)
+    ? insideDhakaShipping
+    : outsideDhakaShipping;
 
   useEffect(() => {
     try {
@@ -226,8 +234,11 @@ const DeliveryInfo = () => {
           <div>
             <p>Delivery Timeline</p>
             <p className="text-xs text-gray-500">{deliveryTimeline}</p>
+            <p className="text-xs text-gray-500">
+              Inside Dhaka Tk {insideDhakaShipping} / Outside Dhaka Tk {outsideDhakaShipping}
+            </p>
           </div>
-          <div className="ml-auto font-semibold">৳ 150</div>
+          <div className="ml-auto font-semibold">Tk {selectedShippingFee}</div>
         </div>
 
         <div className="flex items-center gap-x-4 mt-3 border-b pb-3 border-gray-200">
@@ -247,7 +258,13 @@ const DeliveryInfo = () => {
         </div>
         <div className="flex items-center gap-x-4 mt-2">
           <GoShieldCheck size={24} className="text-gray-800" />
-          <p>6 Months Seller Warranty</p>
+          <p>
+            {product?.warrantyType === "no warranty"
+              ? "No Warranty"
+              : [product?.warrantyTime, product?.warrantyType]
+                  .filter(Boolean)
+                  .join(" ") || "No Warranty"}
+          </p>
         </div>
       </div>
 

@@ -16,6 +16,11 @@ import {
 
 const ADDRESS_STORAGE_KEY = "pinwheel_delivery_addresses";
 
+const isDhakaAddress = (address) =>
+  String(address?.shippingAddress?.district || address?.shippingAddress?.city || "")
+    .trim()
+    .toLowerCase() === "dhaka";
+
 const CheckOutPage = () => {
   const router = useRouter();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -75,11 +80,25 @@ const CheckOutPage = () => {
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
   );
-  const shippingFee = totalItems > 0 ? 140 : 0;
   const selectedAddress = useMemo(
     () => addresses.find((address) => address.id === selectedAddressId),
     [addresses, selectedAddressId]
   );
+  const shippingFee = useMemo(() => {
+    if (totalItems === 0) return 0;
+
+    const chargeKey = isDhakaAddress(selectedAddress)
+      ? "insideDhaka"
+      : "outsideDhaka";
+    const fallback = chargeKey === "insideDhaka" ? 80 : 120;
+
+    return cartItems.reduce((highestCharge, item) => {
+      const itemCharge = Number(item.shippingCharge?.[chargeKey] ?? fallback);
+      return Number.isFinite(itemCharge)
+        ? Math.max(highestCharge, itemCharge)
+        : highestCharge;
+    }, 0);
+  }, [cartItems, selectedAddress, totalItems]);
   const editingAddress = useMemo(
     () => addresses.find((address) => address.id === editingAddressId) || null,
     [addresses, editingAddressId]
@@ -249,7 +268,7 @@ const CheckOutPage = () => {
 
   return (
     <div className="bg-gray-100">
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-[1440px]">
         <div className="flex flex-col p-0 lg:flex-row xl:gap-[16px]">
           <div className="w-full">
             <DeliveryAddressSection

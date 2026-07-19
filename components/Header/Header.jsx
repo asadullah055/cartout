@@ -9,8 +9,8 @@ import Search from "../Search";
 import Logo from "./Logo";
 const Headers = () => {
   return (
-    <header className=" bg-[#f5f5f5] w-full shadow sticky top-0 z-50">
-      <section className="flex sm:justify-evenly justify-between items-center p-2 max-w-[1280px] mx-auto">
+    <header className="w-full bg-white shadow sticky top-0 z-50">
+      <section className="flex sm:justify-evenly justify-between items-center p-2 max-w-[1440px] mx-auto">
         <AiOutlineMenu className="font-bold md:hidden block" size={25} />
         <Logo />
         {/* search */}

@@ -55,7 +55,7 @@ const CartPage = () => {
 
   return (
     <div className="bg-gray-100">
-      <div className="mx-auto max-w-[1280px] p-2">
+      <div className="mx-auto max-w-[1440px] p-2">
         <div className="flex flex-wrap gap-2 md:flex-nowrap">
           <div className="w-full md:w-[70%]">
             <div className="mb-2 flex items-center bg-white p-3">

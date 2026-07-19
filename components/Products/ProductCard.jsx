@@ -5,6 +5,26 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { addToCart, writeBuyNowItem } from "@/utils/cart";
 
+const isDiscountActive = (variant) => {
+  const discountPrice = Number(variant?.discountPrice);
+  const regularPrice = Number(variant?.price);
+
+  if (!discountPrice || !regularPrice || discountPrice >= regularPrice) return false;
+
+  if (!variant.discountStartDate && !variant.discountEndDate) return true;
+
+  const now = new Date();
+  const startDate = variant.discountStartDate ? new Date(variant.discountStartDate) : null;
+  const endDate = variant.discountEndDate ? new Date(variant.discountEndDate) : null;
+
+  if (startDate && Number.isNaN(startDate.getTime())) return false;
+  if (endDate && Number.isNaN(endDate.getTime())) return false;
+  if (startDate && now < startDate) return false;
+  if (endDate && now > endDate) return false;
+
+  return true;
+};
+
 const ProductCard = ({ product }) => {
   const router = useRouter();
   const availableVariants =
@@ -13,15 +33,16 @@ const ProductCard = ({ product }) => {
   if (availableVariants.length === 0) return null;
 
   const variant = availableVariants[0];
+  const hasActiveDiscount = isDiscountActive(variant);
 
   let discount = null;
-  if (variant.discountPrice && variant.discountPrice < variant.price) {
+  if (hasActiveDiscount) {
     discount = Math.round(
       ((variant.price - variant.discountPrice) / variant.price) * 100
     );
   }
 
-  const unitPrice = variant.discountPrice || variant.price;
+  const unitPrice = hasActiveDiscount ? variant.discountPrice : variant.price;
 
   const getCartItem = () => ({
     id: `${product._id}-${variant._id || "default"}`,
@@ -32,6 +53,10 @@ const ProductCard = ({ product }) => {
     size: variant.attributes?.Size || variant.attributes?.size || "",
     unitPrice,
     quantity: 1,
+    shippingCharge: product.shippingCharge || {
+      insideDhaka: 80,
+      outsideDhaka: 120,
+    },
     image: product?.images?.[0] || "/images/001.jpg",
   });
 
@@ -68,7 +93,7 @@ const ProductCard = ({ product }) => {
       </Link>
 
       <div className="mt-1 flex items-center justify-center gap-2">
-        {variant.discountPrice ? (
+        {hasActiveDiscount ? (
           <>
             <span className="text-[18px] font-bold text-[#ff3300]">
               ৳{variant.discountPrice}

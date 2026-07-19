@@ -10,6 +10,26 @@ import { addToCart, writeBuyNowItem } from "@/utils/cart";
 import ProductDescription from "./ProductDescription";
 import VariantSelector from "./VariantSelector";
 
+const isDiscountActive = (variant) => {
+  const discountPrice = Number(variant?.discountPrice);
+  const regularPrice = Number(variant?.price);
+
+  if (!discountPrice || !regularPrice || discountPrice >= regularPrice) return false;
+
+  if (!variant.discountStartDate && !variant.discountEndDate) return true;
+
+  const now = new Date();
+  const startDate = variant.discountStartDate ? new Date(variant.discountStartDate) : null;
+  const endDate = variant.discountEndDate ? new Date(variant.discountEndDate) : null;
+
+  if (startDate && Number.isNaN(startDate.getTime())) return false;
+  if (endDate && Number.isNaN(endDate.getTime())) return false;
+  if (startDate && now < startDate) return false;
+  if (endDate && now > endDate) return false;
+
+  return true;
+};
+
 const Details = ({ product }) => {
   const router = useRouter();
   const availableVariants = useMemo(
@@ -23,7 +43,10 @@ const Details = ({ product }) => {
   if (!selectedVariant) return null;
 
   const maxStock = Math.max(1, selectedVariant.stock || 1);
-  const currentPrice = selectedVariant.discountPrice || selectedVariant.price;
+  const hasActiveDiscount = isDiscountActive(selectedVariant);
+  const currentPrice = hasActiveDiscount
+    ? selectedVariant.discountPrice
+    : selectedVariant.price;
 
   const getCartItem = () => ({
     id: `${product._id}-${selectedVariant._id || "default"}`,
@@ -40,6 +63,10 @@ const Details = ({ product }) => {
       "",
     unitPrice: currentPrice,
     quantity,
+    shippingCharge: product.shippingCharge || {
+      insideDhaka: 80,
+      outsideDhaka: 120,
+    },
     image: product?.images?.[0] || "/images/001.jpg",
   });
 
@@ -61,7 +88,7 @@ const Details = ({ product }) => {
         <div>
           <span className="text-2xl font-bold text-[#ff3300]">৳ {currentPrice}</span>
 
-          {selectedVariant.discountPrice && (
+          {hasActiveDiscount && (
             <span className="ml-2 text-sm font-bold text-gray-500 line-through">
               ৳ {selectedVariant.price}
             </span>
@@ -78,7 +105,7 @@ const Details = ({ product }) => {
             Only <b>{selectedVariant.stock}</b> left
           </p>
         </div>
-        <img src="/images/cartout.png" alt="logo" className="w-30" />
+        <img src="/images/new logo.jpeg" alt="logo" className="w-24 object-contain" />
       </div>
 
       <ProductDescription html={product.shortDescription} />
