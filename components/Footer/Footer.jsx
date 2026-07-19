@@ -102,11 +102,11 @@ const Footer = () => {
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.2fr_1fr_0.9fr_1.25fr] lg:gap-10 lg:px-8">
         <div className="lg:border-r lg:border-white/20 lg:pr-8">
           <Image
-            src="/images/new logo.jpeg"
+            src="/images/darklogo.png"
             alt="CartOut"
             width={190}
-            height={152}
-            className="mb-4 h-auto w-[150px] rounded-md bg-white object-contain"
+            height={67}
+            className="mb-4 h-auto w-[150px] object-contain"
           />
           <p className="max-w-[310px] text-sm leading-6 text-gray-400">
             Your trusted online shopping destination in Bangladesh. We bring you
