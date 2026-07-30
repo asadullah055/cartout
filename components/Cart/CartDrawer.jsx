@@ -14,7 +14,7 @@ import { GoHomeFill } from "react-icons/go";
 import { IoMdClose } from "react-icons/io";
 import { IoCartOutline } from "react-icons/io5";
 
-export default function CartDrawer() {
+export default function CartDrawer({ showLabel = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const drawerRef = useRef();
@@ -71,17 +71,39 @@ export default function CartDrawer() {
 
   return (
     <div className="relative">
-      <div onClick={toggleDrawer} className="relative cursor-pointer">
-        <IoCartOutline size={30} />
-        <span className="absolute -right-1 -top-2 inline-block h-[16px] w-[16px] rounded-full bg-red-500 text-center text-[10px] leading-4 text-white">
-          {totalQuantity || "0"}
-        </span>
+      <div
+        onClick={toggleDrawer}
+        className="relative flex cursor-pointer flex-col items-center gap-1 text-gray-950"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleDrawer();
+          }
+        }}
+      >
+        <div className="relative">
+          <IoCartOutline
+            className={
+              showLabel
+                ? "h-7 w-7 sm:h-8 sm:w-8 lg:h-[37px] lg:w-[37px]"
+                : "h-[30px] w-[30px]"
+            }
+          />
+          <span className="absolute -right-2 -top-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#f6bf00] px-1 text-[10px] font-bold leading-none text-gray-950 sm:h-[20px] sm:min-w-[20px] sm:text-[11px] lg:h-[22px] lg:min-w-[22px] lg:text-[12px]">
+            {totalQuantity || "0"}
+          </span>
+        </div>
+        {showLabel ? (
+          <span className="text-[11px] font-semibold leading-none sm:text-[12px] lg:text-[13px]">Cart</span>
+        ) : null}
       </div>
 
       {isOpen && (
         <div
           ref={drawerRef}
-          className="absolute right-0 top-12 z-50 flex h-[80vh] w-[100vw] max-w-sm flex-col bg-white shadow-lg transition-transform duration-300 md:h-[70vh]"
+          className="absolute right-0 top-11 z-50 flex h-[80vh] w-[calc(100vw-24px)] max-w-sm flex-col bg-white shadow-lg transition-transform duration-300 sm:w-[100vw] md:h-[70vh]"
         >
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 shadow">
             <h3 className="flex items-center gap-2 text-lg font-bold text-gray-500">

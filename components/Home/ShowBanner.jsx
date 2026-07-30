@@ -19,13 +19,13 @@ const ShowBanner = ({ banners }) => {
                 delay: 3000,
                 disableOnInteraction: false,
             }}
-            className="hero-swiper h-full overflow-hidden rounded-lg">
+            className="hero-swiper aspect-[23/10] overflow-hidden rounded-lg sm:aspect-[23/9] lg:aspect-[23/8]">
             {mainBanners.map((banner, index) => (
                 <SwiperSlide key={banner._id}>
                     <Link
                         href={banner.targetUrl ?? "#"}
                         target="_blank"
-                        className="relative block aspect-[1.96/1] h-full w-full overflow-hidden rounded-lg bg-[#eef4ff]"
+                        className="relative block h-full w-full overflow-hidden rounded-lg bg-[#eef4ff]"
                     >
                         <Image
                             src={banner.bannerURL}
@@ -33,7 +33,7 @@ const ShowBanner = ({ banners }) => {
                             fill
                             priority={index === 0}
                             sizes="(min-width: 1024px) 70vw, 100vw"
-                            className="cursor-pointer object-cover"
+                            className="cursor-pointer object-contain"
                         />
                     </Link>
                 </SwiperSlide>

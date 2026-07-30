@@ -98,15 +98,15 @@ const LinkList = ({ items }) => (
 
 const Footer = () => {
   return (
-    <footer className="mt-8 bg-[#0b0f16] text-gray-300">
+    <footer className="mt-8 bg-[#0d0d0d] text-gray-300">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.2fr_1fr_0.9fr_1.25fr] lg:gap-10 lg:px-8">
         <div className="lg:border-r lg:border-white/20 lg:pr-8">
           <Image
             src="/images/darklogo.png"
             alt="CartOut"
-            width={190}
-            height={67}
-            className="mb-4 h-auto w-[150px] object-contain"
+            width={260}
+            height={92}
+            className="h-auto w-[200px] object-contain sm:w-[220px]"
           />
           <p className="max-w-[310px] text-sm leading-6 text-gray-400">
             Your trusted online shopping destination in Bangladesh. We bring you

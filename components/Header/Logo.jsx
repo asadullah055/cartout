@@ -3,14 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 const Logo = () => {
   return (
-    <Link href="/" className="block w-[86px] shrink-0 sm:w-[120px]">
+    <Link
+      href="/"
+      className="relative block h-[54px] w-28 shrink-0 overflow-hidden sm:h-[64px] sm:w-36 lg:h-[74px] lg:w-44"
+    >
       <Image
         priority
-        src="/images/new logo.jpeg"
+        src="/images/mainlogo.png"
         height={136}
         width={170}
         alt="cartout"
-        className="h-auto w-full object-contain"
+        className="h-full w-full scale-[1.18] object-contain object-left -translate-y-1"
       />
     </Link>
   );

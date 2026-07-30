@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CiHeart } from "react-icons/ci";
+import { FaFire, FaStar } from "react-icons/fa";
+import { FiShoppingBag } from "react-icons/fi";
 import { HiOutlineMinusSm, HiOutlinePlus } from "react-icons/hi";
 import { IoShareSocialSharp } from "react-icons/io5";
 import { addToCart, writeBuyNowItem } from "@/utils/cart";
@@ -30,6 +32,11 @@ const isDiscountActive = (variant) => {
   return true;
 };
 
+const toNumberOrNull = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+
 const Details = ({ product }) => {
   const router = useRouter();
   const availableVariants = useMemo(
@@ -47,6 +54,26 @@ const Details = ({ product }) => {
   const currentPrice = hasActiveDiscount
     ? selectedVariant.discountPrice
     : selectedVariant.price;
+  const regularPrice = Number(selectedVariant.price);
+  const salePrice = Number(currentPrice);
+  const savedAmount = hasActiveDiscount ? regularPrice - salePrice : 0;
+  const savedPercent = hasActiveDiscount
+    ? Math.round((savedAmount / regularPrice) * 100)
+    : 0;
+  const rating = toNumberOrNull(
+    product.rating ?? product.averageRating ?? product.avgRating
+  );
+  const reviewCount = toNumberOrNull(
+    product.reviewCount ??
+      product.reviewsCount ??
+      product.totalReviews ??
+      (Array.isArray(product.reviews) ? product.reviews.length : null)
+  );
+  const soldCount = toNumberOrNull(
+    product.soldCount ?? product.totalSold ?? product.sold ?? product.salesCount
+  );
+  const hasReviewMeta = rating !== null || reviewCount !== null;
+  const hasSoldMeta = soldCount !== null;
 
   const getCartItem = () => ({
     id: `${product._id}-${selectedVariant._id || "default"}`,
@@ -82,30 +109,81 @@ const Details = ({ product }) => {
 
   return (
     <div className="p-2">
-      <h1 className="text-xl font-medium">{product.productName}</h1>
+      <div className="relative pr-8">
+        <h1 className="text-[22px] font-bold leading-tight text-[#151515] md:text-[24px]">
+          {product.productName}
+        </h1>
+        <button
+          type="button"
+          aria-label="Share product"
+          className="absolute right-0 top-0 text-gray-500"
+        >
+          <IoShareSocialSharp size={23} />
+        </button>
+      </div>
 
-      <div className="mt-2 flex items-center justify-between">
-        <div>
-          <span className="text-2xl font-bold text-[#ff3300]">৳ {currentPrice}</span>
+      {(hasReviewMeta || hasSoldMeta) && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] font-semibold text-gray-800">
+          {hasReviewMeta && (
+            <>
+              {rating !== null && (
+                <div className="flex items-center gap-[2px]">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <FaStar
+                      key={index}
+                      className={
+                        index < Math.round(rating)
+                          ? "text-[#f6a800]"
+                          : "text-gray-300"
+                      }
+                      size={13}
+                    />
+                  ))}
+                </div>
+              )}
+              <span>
+                {rating !== null ? rating.toFixed(1) : ""}
+                {reviewCount !== null ? ` (${reviewCount} Reviews)` : ""}
+              </span>
+            </>
+          )}
 
-          {hasActiveDiscount && (
-            <span className="ml-2 text-sm font-bold text-gray-500 line-through">
-              ৳ {selectedVariant.price}
+          {hasReviewMeta && hasSoldMeta && (
+            <span className="h-4 w-px bg-gray-300" />
+          )}
+
+          {hasSoldMeta && (
+            <span className="flex items-center gap-1">
+              <FiShoppingBag size={13} />
+              Sold: {soldCount}
             </span>
           )}
         </div>
+      )}
 
-        <IoShareSocialSharp size={24} className="cursor-pointer text-gray-500" />
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <span className="text-[28px] font-bold leading-none text-[#ff3300]">
+          &#2547; {salePrice.toLocaleString("en-US")}
+        </span>
+
+        {hasActiveDiscount && (
+          <>
+            <span className="text-[15px] font-bold text-gray-500 line-through">
+              &#2547; {regularPrice.toLocaleString("en-US")}
+            </span>
+            <span className="rounded-[4px] bg-[#ffe9e5] px-1.5 py-0.5 text-[11px] font-bold text-[#ff3300]">
+              Save &#2547;{savedAmount.toLocaleString("en-US")} ({savedPercent}%)
+            </span>
+          </>
+        )}
       </div>
 
-      <div className="mt-2 flex items-center justify-between">
-        <div>
-          <p className="font-medium text-[#669900]">In Stock</p>
-          <p className="text-[14px]">
-            Only <b>{selectedVariant.stock}</b> left
-          </p>
-        </div>
-        <img src="/images/new logo.jpeg" alt="logo" className="w-24 object-contain" />
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-[12px] font-bold">
+        <p className="text-[#16a34a]">In Stock</p>
+        <p className="flex items-center gap-1 text-[#ff5a1f]">
+          <FaFire size={12} />
+          Only {selectedVariant.stock} left!
+        </p>
       </div>
 
       <ProductDescription html={product.shortDescription} />
@@ -145,7 +223,7 @@ const Details = ({ product }) => {
       <div className="mt-4 flex w-full items-center gap-2 md:w-[80%]">
         <button
           onClick={handleBuyNow}
-          className="w-[40%] rounded bg-amber-400 px-4 py-2 text-black transition duration-200 hover:bg-amber-500 cursor-pointer"
+          className="w-[40%] cursor-pointer rounded bg-amber-400 px-4 py-2 text-black transition duration-200 hover:bg-amber-500"
           type="button"
         >
           Buy Now
@@ -153,7 +231,7 @@ const Details = ({ product }) => {
 
         <button
           onClick={handleAddToCart}
-          className="w-[40%] rounded bg-[#ff3300] px-4 py-2 text-white transition duration-200 hover:bg-orange-600 cursor-pointer"
+          className="w-[40%] cursor-pointer rounded bg-[#ff3300] px-4 py-2 text-white transition duration-200 hover:bg-orange-600"
           type="button"
         >
           Add to Cart
