@@ -4,10 +4,16 @@ import ImageSlider from "@/components/ProductDetails/ImageSlider";
 import ProductTabs from "@/components/ProductDetails/ProductTabs";
 import SellerInfo from "@/components/ProductDetails/SellerInfo";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://pinwheel-server.vercel.app/api"
+    : "http://localhost:8000/api");
+
 // 🔹 SERVER SIDE DATA FETCH
 async function getProduct(slug) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/product/slug/${slug}`,
+    `${API_BASE_URL}/product/slug/${slug}`,
     {
       cache: "no-store", // 👈 always fresh (SSR)
     }
@@ -38,7 +44,7 @@ const ProductDetails = async ({ params }) => {
 
         <div className="col-span-1 sm:col-span-2 md:col-span-12 lg:col-span-2 bg-[#FAFAFA]">
           <DeliveryInfo product={product} />
-          <SellerInfo seller={product.seller} />
+          <SellerInfo product={product} />
         </div>
 
       </div>
