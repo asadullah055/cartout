@@ -186,7 +186,7 @@ const Details = ({ product }) => {
         </p>
       </div>
 
-      <ProductDescription html={product.shortDescription} />
+      <ProductDescription html={product.shortDescription} showAsFeatures />
 
       {product.variants.some(
         (v) => v.attributes && Object.keys(v.attributes).length > 0

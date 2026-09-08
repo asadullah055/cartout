@@ -174,9 +174,14 @@ const Footer = () => {
                   Be the first to know about new arrivals, exclusive offers and
                   exciting updates.
                 </p>
-                <button className="mt-4 rounded-md bg-[#f5b400] px-8 py-2 text-sm font-bold text-[#111827] hover:bg-[#ffca2c]">
+                <a
+                  href="https://www.facebook.com/groups/1409319587782992"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-block rounded-md bg-[#f5b400] px-8 py-2 text-sm font-bold text-[#111827] hover:bg-[#ffca2c]"
+                >
                   Join Now
-                </button>
+                </a>
               </div>
             </div>
           </div>

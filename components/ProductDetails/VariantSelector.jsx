@@ -44,7 +44,7 @@ const VariantSelector = ({
 
         return (
           <div key={attrKey}>
-            <label className="block font-medium mb-2">
+            <label className="mb-2 block font-medium capitalize">
               {attrKey}
             </label>
 
@@ -56,6 +56,7 @@ const VariantSelector = ({
                 return (
                   <button
                     key={option}
+                    type="button"
                     onClick={() => {
                       const nextVariant = findMatchingVariant(
                         attrKey,
@@ -63,7 +64,7 @@ const VariantSelector = ({
                       );
                       nextVariant && setSelectedVariant(nextVariant);
                     }}
-                    className={`px-3 py-1 border rounded
+                    className={`rounded border px-3 py-1 capitalize
                       ${
                         isActive
                           ? "border-black bg-gray-100"
