@@ -71,9 +71,9 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="mt-2 w-full rounded-md bg-white p-3 hover:shadow-md">
+    <div className="mt-2 w-full rounded-md bg-white p-1.5 hover:shadow-md sm:p-2">
       <Link href={`/product/${product.slug}`}>
-        <div className="relative overflow-hidden rounded-md border border-gray-100 bg-gray-50 p-2 transition duration-200 hover:border-orange-100">
+        <div className="relative overflow-hidden rounded-md border border-gray-100 bg-white p-1 transition duration-200 hover:border-orange-100">
           {discount && (
             <span className="absolute right-1 top-1 rounded bg-red-600 px-2 py-0.5 text-xs text-white">
               -{discount}%
@@ -83,38 +83,38 @@ const ProductCard = ({ product }) => {
           <img
             src={product?.images?.[0]}
             alt={product?.productName}
-            className="h-36 w-full object-contain"
+            className="h-36 w-full object-contain object-center sm:h-40"
           />
         </div>
 
-        <h2 className="mt-2 line-clamp-1 text-[14px] font-semibold">
+        <h2 className="mt-2 line-clamp-1 text-[13px] font-semibold sm:text-[14px]">
           {product?.productName}
         </h2>
       </Link>
 
-      <div className="mt-1 flex items-center justify-center gap-2">
+      <div className="mt-1 flex min-w-0 items-baseline justify-center gap-1.5 sm:gap-2">
         {hasActiveDiscount ? (
           <>
-            <span className="text-[18px] font-bold text-[#ff3300]">
+            <span className="text-[16px] font-bold leading-6 text-[#ff3300] sm:text-[18px]">
               ৳{variant.discountPrice}
             </span>
-            <span className="text-sm text-gray-500 line-through">৳{variant.price}</span>
+            <span className="truncate text-[12px] text-gray-500 line-through sm:text-sm">৳{variant.price}</span>
           </>
         ) : (
-          <span className="text-[18px] font-bold text-[#ff3300]">৳{variant.price}</span>
+          <span className="text-[16px] font-bold leading-6 text-[#ff3300] sm:text-[18px]">৳{variant.price}</span>
         )}
       </div>
 
-      <div className="mt-2 flex justify-between gap-1 sm:gap-2">
+      <div className="mt-2 grid grid-cols-2 gap-1.5 sm:gap-2">
         <button
-          className="rounded bg-[#ff3300] px-2 py-1 text-[10px] font-bold text-white md:text-[12px] transition duration-200 hover:bg-orange-600 cursor-pointer"
+          className="min-h-8 whitespace-nowrap rounded bg-[#ff3300] px-1.5 py-0.5 text-[9px] font-bold leading-4 text-white transition duration-200 hover:bg-orange-600 sm:px-2 sm:text-[10px] xl:text-[12px]"
           type="button"
           onClick={handleBuyNow}
         >
           BUY NOW
         </button>
         <button
-          className="rounded border border-orange-600 px-2 py-1 text-[10px] font-bold text-orange-500 md:text-[12px] transition duration-200 hover:bg-orange-50 cursor-pointer"
+          className="min-h-8 whitespace-nowrap rounded border border-orange-600 px-1.5 py-0.5 text-[9px] font-bold leading-4 text-orange-500 transition duration-200 hover:bg-orange-50 sm:px-2 sm:text-[10px] xl:text-[12px]"
           type="button"
           onClick={handleAddToCart}
         >

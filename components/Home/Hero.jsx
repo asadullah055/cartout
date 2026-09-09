@@ -16,7 +16,7 @@ const Hero = async () => {
   const sideBanner = sideBanners[0];
 
   return (
-    <section className="grid gap-4 pt-4 md:gap-5 lg:grid-cols-[2.6fr_1fr] lg:items-stretch">
+    <section className="grid gap-4 px-3 pt-4 sm:px-4 md:gap-5 lg:grid-cols-[2.6fr_1fr] lg:items-stretch lg:px-0">
       <div className="min-w-0">
         <ShowBanner banners={banners} />
       </div>

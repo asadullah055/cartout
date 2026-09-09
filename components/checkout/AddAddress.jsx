@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { IoCheckmark, IoClose } from "react-icons/io5";
 
 const BASE_URL = "https://geo-location-bd.vercel.app/bd-geocode";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const initialForm = {
   contactName: "",
@@ -165,6 +166,7 @@ const AddAddress = ({ isOpen, onClose, onSave, editingAddress }) => {
     if (
       !form.contactName.trim() ||
       !mobileNumber ||
+      !form.email.trim() ||
       !form.street.trim() ||
       !selectedDivision ||
       !selectedDistrict ||
@@ -172,6 +174,11 @@ const AddAddress = ({ isOpen, onClose, onSave, editingAddress }) => {
       !selectedArea
     ) {
       setFormError("Please fill all required fields.");
+      return;
+    }
+
+    if (!EMAIL_PATTERN.test(form.email.trim())) {
+      setFormError("Please enter a valid email address.");
       return;
     }
 
@@ -273,7 +280,7 @@ const AddAddress = ({ isOpen, onClose, onSave, editingAddress }) => {
             </div>
 
             <label className="mb-2 block text-sm font-semibold text-[#344054]">
-              Email <span className="text-[#667085]">(Optional)</span>
+              Email <span className="text-[#F04438]">*</span>
             </label>
             <input
               className="mb-5 h-[44px] w-full rounded border border-[#98A2B3] px-4 text-base outline-none"

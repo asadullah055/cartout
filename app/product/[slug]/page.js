@@ -3,6 +3,7 @@ import Details from "@/components/ProductDetails/Details";
 import ImageSlider from "@/components/ProductDetails/ImageSlider";
 import ProductTabs from "@/components/ProductDetails/ProductTabs";
 import SellerInfo from "@/components/ProductDetails/SellerInfo";
+import { notFound } from "next/navigation";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -13,17 +14,27 @@ const API_BASE_URL =
 // 🔹 SERVER SIDE DATA FETCH
 async function getProduct(slug) {
   const res = await fetch(
-    `${API_BASE_URL}/product/slug/${slug}`,
+    `${API_BASE_URL}/product/slug/${encodeURIComponent(slug)}`,
     {
       cache: "no-store", // 👈 always fresh (SSR)
     }
   );
 
+  if (res.status === 404) {
+    notFound();
+  }
+
   if (!res.ok) {
     throw new Error("Failed to fetch product");
   }
 
-  return res.json();
+  const data = await res.json();
+
+  if (!data?.product) {
+    notFound();
+  }
+
+  return data;
 }
 
 const ProductDetails = async ({ params }) => {
