@@ -9,8 +9,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 const ZOOM_PREVIEW_WIDTH = 620;
 const ZOOM_PREVIEW_HEIGHT = 480;
+const FALLBACK_IMAGE = "/images/001.jpg";
 
 const ImageSlider = ({ images }) => {
+  const productImages = Array.isArray(images) && images.length ? images : [FALLBACK_IMAGE];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -81,9 +83,12 @@ const ImageSlider = ({ images }) => {
       >
         <img
           ref={imageRef}
-          src={images[selectedIndex]}
+          src={productImages[selectedIndex] || FALLBACK_IMAGE}
           alt="Selected product"
           className="max-h-full max-w-full object-contain"
+          onError={(event) => {
+            event.currentTarget.src = FALLBACK_IMAGE;
+          }}
         />
       </div>
 
@@ -91,7 +96,7 @@ const ImageSlider = ({ images }) => {
         <div
           className="pointer-events-none absolute left-[calc(100%+16px)] top-3 z-50 hidden h-[480px] w-[620px] rounded-md border border-gray-200 bg-white bg-no-repeat shadow-xl lg:block"
           style={{
-            backgroundImage: `url(${images[selectedIndex]})`,
+            backgroundImage: `url(${productImages[selectedIndex] || FALLBACK_IMAGE})`,
             backgroundPosition: zoomStyle.backgroundPosition,
             backgroundSize: zoomStyle.backgroundSize,
           }}
@@ -123,10 +128,10 @@ const ImageSlider = ({ images }) => {
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
         >
-          {images.map((img, index) => (
+          {productImages.map((img, index) => (
             <SwiperSlide key={index}>
               <img
-                src={img}
+                src={img || FALLBACK_IMAGE}
                 alt={`Thumbnail ${index}`}
                 onClick={() => setSelectedIndex(index)}
                 className={`h-20 w-20 cursor-pointer rounded-md border object-contain p-1 transition-all duration-300 ${
@@ -134,6 +139,9 @@ const ImageSlider = ({ images }) => {
                     ? "border-orange-500 shadow-sm"
                     : "border-gray-200 hover:border-orange-200"
                 }`}
+                onError={(event) => {
+                  event.currentTarget.src = FALLBACK_IMAGE;
+                }}
               />
             </SwiperSlide>
           ))}

@@ -25,6 +25,8 @@ const isDiscountActive = (variant) => {
   return true;
 };
 
+const FALLBACK_IMAGE = "/images/001.jpg";
+
 const ProductCard = ({ product }) => {
   const router = useRouter();
   const availableVariants =
@@ -57,7 +59,7 @@ const ProductCard = ({ product }) => {
       insideDhaka: 80,
       outsideDhaka: 120,
     },
-    image: product?.images?.[0] || "/images/001.jpg",
+    image: product?.images?.[0] || FALLBACK_IMAGE,
   });
 
   const handleAddToCart = () => {
@@ -81,9 +83,12 @@ const ProductCard = ({ product }) => {
           )}
 
           <img
-            src={product?.images?.[0]}
+            src={product?.images?.[0] || FALLBACK_IMAGE}
             alt={product?.productName}
             className="h-36 w-full object-contain object-center sm:h-40"
+            onError={(event) => {
+              event.currentTarget.src = FALLBACK_IMAGE;
+            }}
           />
         </div>
 

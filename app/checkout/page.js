@@ -227,7 +227,9 @@ const CheckOutPage = () => {
         },
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/create`, {
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL || "https://pinwheel-server.vercel.app/api";
+      const response = await fetch(`${apiBaseUrl}/order/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -236,7 +238,7 @@ const CheckOutPage = () => {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(data?.message || "Failed to place order");
