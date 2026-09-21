@@ -45,15 +45,16 @@ export default function ProductTabs({ product }) {
     .filter((item) => item.question);
 
   return (
-    <div className="w-full">
-      <div className="flex w-1/2 gap-8 border-b-2 border-gray-300 text-sm font-medium">
+    <div className="w-full px-2 pt-4 sm:px-3">
+      <div className="overflow-x-auto border-b border-gray-300">
+        <div className="flex min-w-max gap-5 text-[12px] font-semibold uppercase sm:gap-8 sm:text-sm">
         <button
           type="button"
           onClick={() => setActiveTab("description")}
-          className={`pb-3 ${
+          className={`whitespace-nowrap border-b-2 px-0.5 pb-3 ${
             activeTab === "description"
-              ? "border-b-2 border-green-500 text-black"
-              : "text-gray-400"
+              ? "border-green-500 text-black"
+              : "border-transparent text-gray-400"
           }`}
         >
           DESCRIPTION
@@ -61,10 +62,10 @@ export default function ProductTabs({ product }) {
         <button
           type="button"
           onClick={() => setActiveTab("reviews")}
-          className={`pb-3 ${
+          className={`whitespace-nowrap border-b-2 px-0.5 pb-3 ${
             activeTab === "reviews"
-              ? "border-b-2 border-green-500 text-black"
-              : "text-gray-400"
+              ? "border-green-500 text-black"
+              : "border-transparent text-gray-400"
           }`}
         >
           REVIEWS
@@ -72,17 +73,18 @@ export default function ProductTabs({ product }) {
         <button
           type="button"
           onClick={() => setActiveTab("questions")}
-          className={`pb-3 ${
+          className={`whitespace-nowrap border-b-2 px-0.5 pb-3 normal-case sm:uppercase ${
             activeTab === "questions"
-              ? "border-b-2 border-green-500 text-black"
-              : "text-gray-400"
+              ? "border-green-500 text-black"
+              : "border-transparent text-gray-400"
           }`}
         >
           Product Questions
         </button>
+        </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4 min-w-0 sm:mt-6">
         {activeTab === "description" && (
           <ProductDescription html={product.description} />
         )}

@@ -34,7 +34,11 @@ const ProductCard = ({ product }) => {
 
   if (availableVariants.length === 0) return null;
 
-  const variant = availableVariants[0];
+  const variant =
+    availableVariants.find((v) => Number(v?.stock || 0) > 0) ||
+    availableVariants[0];
+  const stock = Number(variant?.stock || 0);
+  const isOutOfStock = stock <= 0;
   const hasActiveDiscount = isDiscountActive(variant);
 
   let discount = null;
@@ -50,11 +54,17 @@ const ProductCard = ({ product }) => {
     id: `${product._id}-${variant._id || "default"}`,
     productId: product._id,
     variantId: variant._id || "default",
+    sellerId: product?.creator?._id || "",
     name: product.productName,
+    shopName:
+      product?.creator?.shopName ||
+      product?.creator?.name ||
+      "Cartout Retailer",
     color: variant.attributes?.Color || variant.attributes?.color || "",
     size: variant.attributes?.Size || variant.attributes?.size || "",
     unitPrice,
     quantity: 1,
+    maxStock: stock,
     shippingCharge: product.shippingCharge || {
       insideDhaka: 80,
       outsideDhaka: 120,
@@ -63,11 +73,13 @@ const ProductCard = ({ product }) => {
   });
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(getCartItem());
     toast.success("Product added to cart");
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return;
     writeBuyNowItem(getCartItem());
     router.push("/checkout?buyNow=1");
   };
@@ -79,6 +91,11 @@ const ProductCard = ({ product }) => {
           {discount && (
             <span className="absolute right-1 top-1 rounded bg-red-600 px-2 py-0.5 text-xs text-white">
               -{discount}%
+            </span>
+          )}
+          {isOutOfStock && (
+            <span className="absolute left-1 top-1 rounded bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white">
+              Out of stock
             </span>
           )}
 
@@ -112,16 +129,18 @@ const ProductCard = ({ product }) => {
 
       <div className="mt-2 grid grid-cols-2 gap-1.5 sm:gap-2">
         <button
-          className="min-h-8 whitespace-nowrap rounded bg-[#ff3300] px-1.5 py-0.5 text-[9px] font-bold leading-4 text-white transition duration-200 hover:bg-orange-600 sm:px-2 sm:text-[10px] xl:text-[12px]"
+          className="min-h-8 whitespace-nowrap rounded bg-[#ff3300] px-1.5 py-0.5 text-[9px] font-bold leading-4 text-white transition duration-200 hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 sm:px-2 sm:text-[10px] xl:text-[12px]"
           type="button"
           onClick={handleBuyNow}
+          disabled={isOutOfStock}
         >
-          BUY NOW
+          {isOutOfStock ? "OUT OF STOCK" : "BUY NOW"}
         </button>
         <button
-          className="min-h-8 whitespace-nowrap rounded border border-orange-600 px-1.5 py-0.5 text-[9px] font-bold leading-4 text-orange-500 transition duration-200 hover:bg-orange-50 sm:px-2 sm:text-[10px] xl:text-[12px]"
+          className="min-h-8 whitespace-nowrap rounded border border-orange-600 px-1.5 py-0.5 text-[9px] font-bold leading-4 text-orange-500 transition duration-200 hover:bg-orange-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 disabled:hover:bg-white sm:px-2 sm:text-[10px] xl:text-[12px]"
           type="button"
           onClick={handleAddToCart}
+          disabled={isOutOfStock}
         >
           ADD TO CART
         </button>

@@ -42,7 +42,7 @@ const ProductDetails = async ({ params }) => {
   const {product} = await getProduct(slug);
 
   return (
-    <div className="max-w-[1440px] mx-auto mt-2">
+    <div className="mx-auto mt-2 max-w-[1440px] overflow-hidden px-1 sm:px-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-2">
         
         <div className="col-span-1 md:col-span-2">

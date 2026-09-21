@@ -8,18 +8,44 @@ import CheckoutSidebar from "@/components/checkout/CheckoutSidebar";
 import DeliveryAddressSection from "@/components/checkout/DeliveryAddressSection";
 import {
   cartEventName,
+  calculateShippingFeeBySeller,
   clearBuyNowItem,
   readBuyNowItem,
   readCart,
+  refreshCartShopNames,
   writeCart,
 } from "@/utils/cart";
 
 const ADDRESS_STORAGE_KEY = "pinwheel_delivery_addresses";
 
 const isDhakaAddress = (address) =>
-  String(address?.shippingAddress?.district || address?.shippingAddress?.city || "")
+  String(
+    address?.shippingAddress?.fullAddress ||
+      address?.fullAddress ||
+      address?.displayAddress ||
+      address?.shippingAddress?.district ||
+      address?.shippingAddress?.city ||
+      ""
+  )
     .trim()
-    .toLowerCase() === "dhaka";
+    .toLowerCase()
+    .includes("dhaka");
+
+const getStockIssue = (items) => {
+  const item = items.find((entry) => {
+    const maxStock = Number(entry?.maxStock);
+    return Number.isFinite(maxStock) && Number(entry.quantity || 0) > maxStock;
+  });
+
+  if (!item) return "";
+
+  const maxStock = Number(item.maxStock);
+  if (maxStock <= 0) {
+    return `${item.name || "This product"} is out of stock.`;
+  }
+
+  return `${item.name || "This product"} has only ${maxStock} items in stock.`;
+};
 
 const CheckOutPage = () => {
   const router = useRouter();
@@ -37,8 +63,13 @@ const CheckOutPage = () => {
     const shouldUseBuyNow = searchParams.get("buyNow") === "1";
     const buyNowItem = shouldUseBuyNow ? readBuyNowItem() : null;
 
+    const initialCartItems = buyNowItem ? [buyNowItem] : readCart();
+
     setIsBuyNowCheckout(Boolean(buyNowItem));
-    setCartItems(buyNowItem ? [buyNowItem] : readCart());
+    setCartItems(initialCartItems);
+    refreshCartShopNames(initialCartItems, {
+      persist: !buyNowItem,
+    }).then(setCartItems);
 
     try {
       const savedAddresses = JSON.parse(
@@ -90,19 +121,13 @@ const CheckOutPage = () => {
     const chargeKey = isDhakaAddress(selectedAddress)
       ? "insideDhaka"
       : "outsideDhaka";
-    const fallback = chargeKey === "insideDhaka" ? 80 : 120;
-
-    return cartItems.reduce((highestCharge, item) => {
-      const itemCharge = Number(item.shippingCharge?.[chargeKey] ?? fallback);
-      return Number.isFinite(itemCharge)
-        ? Math.max(highestCharge, itemCharge)
-        : highestCharge;
-    }, 0);
+    return calculateShippingFeeBySeller(cartItems, chargeKey);
   }, [cartItems, selectedAddress, totalItems]);
   const editingAddress = useMemo(
     () => addresses.find((address) => address.id === editingAddressId) || null,
     [addresses, editingAddressId]
   );
+  const stockIssue = useMemo(() => getStockIssue(cartItems), [cartItems]);
 
   const persistAddresses = (nextAddresses) => {
     window.localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(nextAddresses));
@@ -193,6 +218,11 @@ const CheckOutPage = () => {
   const handlePlaceOrder = async () => {
     if (!cartItems.length || isPlacingOrder) return;
 
+    if (stockIssue) {
+      setOrderFeedback(stockIssue);
+      return;
+    }
+
     if (!selectedAddress) {
       setOrderFeedback("Please add and select a delivery address.");
       return;
@@ -211,6 +241,13 @@ const CheckOutPage = () => {
       const customerPhone = selectedAddress.mobileNumber.startsWith("0")
         ? selectedAddress.mobileNumber
         : `0${selectedAddress.mobileNumber}`;
+      const fullDeliveryAddress =
+        selectedAddress.fullAddress ||
+        selectedAddress.displayAddress ||
+        selectedAddress.street ||
+        selectedAddress.shippingAddress?.fullAddress ||
+        selectedAddress.shippingAddress?.street ||
+        "";
       const payload = {
         items: cartItems.map((item) => ({
           product: item.productId,
@@ -218,7 +255,9 @@ const CheckOutPage = () => {
           quantity: item.quantity,
         })),
         shippingFee,
-        shippingAddress: selectedAddress.shippingAddress,
+        shippingAddress: {
+          fullAddress: fullDeliveryAddress,
+        },
         paymentMethod: "Cash on Delivery",
         customer: {
           name: selectedAddress.contactName,
@@ -269,29 +308,28 @@ const CheckOutPage = () => {
   };
 
   return (
-    <div className="bg-gray-100">
-      <div className="mx-auto max-w-[1440px]">
-        <div className="flex flex-col p-0 lg:flex-row xl:gap-[16px]">
-          <div className="w-full">
-            <DeliveryAddressSection
-              addresses={addresses}
-              selectedAddressId={selectedAddressId}
-              onAddAddressClick={handleAddAddressClick}
-              onSelectAddress={setSelectedAddressId}
-              onDeleteAddress={handleDeleteAddress}
-              onEditAddress={handleEditAddress}
-            />
-            <CheckoutOrderItems cartItems={cartItems} />
-          </div>
-          <CheckoutSidebar
-            subtotal={subtotal}
-            shippingFee={shippingFee}
-            totalItems={totalItems}
-            onPlaceOrder={handlePlaceOrder}
-            isPlacingOrder={isPlacingOrder}
-            orderFeedback={orderFeedback}
+    <div className="min-h-screen bg-[#eef1f5] px-3 py-4 sm:px-5 lg:py-5">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          <DeliveryAddressSection
+            addresses={addresses}
+            selectedAddressId={selectedAddressId}
+            onAddAddressClick={handleAddAddressClick}
+            onSelectAddress={setSelectedAddressId}
+            onDeleteAddress={handleDeleteAddress}
+            onEditAddress={handleEditAddress}
           />
+          <CheckoutOrderItems cartItems={cartItems} />
         </div>
+        <CheckoutSidebar
+          subtotal={subtotal}
+          shippingFee={shippingFee}
+          totalItems={totalItems}
+          onPlaceOrder={handlePlaceOrder}
+          isPlacingOrder={isPlacingOrder}
+          orderFeedback={orderFeedback || stockIssue}
+          hasStockIssue={Boolean(stockIssue)}
+        />
       </div>
       <AddAddress
         isOpen={isAddressModalOpen}

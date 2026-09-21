@@ -6,7 +6,9 @@ import OrderSummary from "@/components/Cart/OrderSummary";
 import { FaRegTrashAlt } from "react-icons/fa";
 import {
   cartEventName,
+  calculateShippingFeeBySeller,
   readCart,
+  refreshCartShopNames,
   removeCartItem,
   updateCartItemQuantity,
   writeCart,
@@ -16,7 +18,9 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    setCartItems(readCart());
+    const initialItems = readCart();
+    setCartItems(initialItems);
+    refreshCartShopNames(initialItems).then(setCartItems);
 
     const syncCart = () => setCartItems(readCart());
     window.addEventListener(cartEventName, syncCart);
@@ -52,6 +56,23 @@ const CartPage = () => {
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
   );
+  const shippingFee = useMemo(() => {
+    if (totalItems === 0) return 0;
+    return calculateShippingFeeBySeller(cartItems, "outsideDhaka");
+  }, [cartItems, totalItems]);
+  const stockIssue = useMemo(() => {
+    const item = cartItems.find((entry) => {
+      const maxStock = Number(entry?.maxStock);
+      return Number.isFinite(maxStock) && Number(entry.quantity || 0) > maxStock;
+    });
+
+    if (!item) return "";
+
+    const maxStock = Number(item.maxStock);
+    return maxStock <= 0
+      ? `${item.name || "This product"} is out of stock.`
+      : `${item.name || "This product"} has only ${maxStock} items in stock.`;
+  }, [cartItems]);
 
   return (
     <div className="bg-gray-100">
@@ -80,7 +101,13 @@ const CartPage = () => {
             </div>
           </div>
           <div className="w-full md:w-[30%]">
-            <OrderSummary totalItems={totalItems} subtotal={subtotal} shippingFee={0} />
+            <OrderSummary
+              totalItems={totalItems}
+              subtotal={subtotal}
+              shippingFee={shippingFee}
+              checkoutDisabled={Boolean(stockIssue)}
+              message={stockIssue}
+            />
           </div>
         </div>
       </div>

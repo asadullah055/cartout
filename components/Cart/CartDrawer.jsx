@@ -3,6 +3,7 @@
 import {
   cartEventName,
   readCart,
+  refreshCartShopNames,
   removeCartItem,
   updateCartItemQuantity,
 } from "@/utils/cart";
@@ -39,9 +40,20 @@ export default function CartDrawer({ showLabel = false }) {
     0
   );
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const getShopName = (item) => item.shopName || item.sellerName || "Cartout Retailer";
+  const getStockLimit = (item) => {
+    const maxStock = Number(item?.maxStock);
+    return Number.isFinite(maxStock) ? maxStock : null;
+  };
+  const hasStockIssue = cartItems.some((item) => {
+    const stockLimit = getStockLimit(item);
+    return stockLimit !== null && Number(item.quantity || 0) > stockLimit;
+  });
 
   useEffect(() => {
-    setCartItems(readCart());
+    const initialItems = readCart();
+    setCartItems(initialItems);
+    refreshCartShopNames(initialItems).then(setCartItems);
 
     const syncCart = () => setCartItems(readCart());
     window.addEventListener(cartEventName, syncCart);
@@ -103,7 +115,7 @@ export default function CartDrawer({ showLabel = false }) {
       {isOpen && (
         <div
           ref={drawerRef}
-          className="absolute right-0 top-11 z-50 flex h-[80vh] w-[calc(100vw-24px)] max-w-sm flex-col bg-white shadow-lg transition-transform duration-300 sm:w-[100vw] md:h-[70vh]"
+          className="fixed inset-x-0 top-[136px] z-[80] flex h-[calc(100dvh-136px)] w-full flex-col bg-white shadow-2xl transition-transform duration-300 md:absolute md:inset-x-auto md:right-0 md:top-11 md:h-[70vh] md:w-[380px] md:max-w-[calc(100vw-24px)]"
         >
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 shadow">
             <h3 className="flex items-center gap-2 text-lg font-bold text-gray-500">
@@ -115,18 +127,36 @@ export default function CartDrawer({ showLabel = false }) {
             </button>
           </div>
 
-          <div className="mt-3 flex-1 overflow-y-auto px-4">
+          <div className="mt-3 flex-1 overflow-y-auto px-3 sm:px-4">
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
-                <div key={item.id} className="flex gap-3 border-b border-gray-200 py-3">
+                <div key={item.id} className="border-b border-gray-200 py-3">
+                  {(() => {
+                    const stockLimit = getStockLimit(item);
+                    const isOutOfStock = stockLimit !== null && stockLimit <= 0;
+                    const isOverStock =
+                      stockLimit !== null &&
+                      stockLimit > 0 &&
+                      Number(item.quantity || 0) > stockLimit;
+
+                    return (
+                      <>
+                  <Link
+                    href="#"
+                    className="mb-2 inline-flex max-w-full items-center gap-1 truncate text-sm font-semibold text-gray-700"
+                  >
+                    <span className="truncate">{getShopName(item)}</span>
+                    <span aria-hidden="true">&gt;</span>
+                  </Link>
+                  <div className="flex gap-3">
                   <Image
                     src={item.image || "/images/001.jpg"}
                     alt={item.name}
                     width={400}
                     height={400}
-                    className="h-16 w-16 rounded object-cover"
+                    className="h-14 w-14 shrink-0 rounded object-contain"
                   />
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-sm font-semibold">{item.name}</p>
                     {item.color ? (
                       <p className="text-[12px] text-gray-700">
@@ -138,27 +168,36 @@ export default function CartDrawer({ showLabel = false }) {
                         Size: <span className="font-semibold">{item.size}</span>
                       </p>
                     ) : null}
+                    {isOutOfStock ? (
+                      <p className="text-[12px] font-semibold text-red-600">Out of stock</p>
+                    ) : isOverStock ? (
+                      <p className="text-[12px] font-semibold text-red-600">
+                        Only {stockLimit} left in stock
+                      </p>
+                    ) : null}
                     <p className="text-[12px] text-gray-700">
-                      Unit Price: <span className="font-semibold text-gray-900">৳ {item.unitPrice}</span>
+                      Unit Price: <span className="font-semibold text-gray-900">Tk {item.unitPrice}</span>
                     </p>
                     <p className="text-[12px] text-gray-700">
-                      Amount: <span className="font-semibold text-gray-900">৳ {item.unitPrice * item.quantity}</span>
+                      Amount: <span className="font-semibold text-gray-900">Tk {item.unitPrice * item.quantity}</span>
                     </p>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex shrink-0 flex-col items-center gap-2">
                     <div className="flex overflow-hidden rounded border border-orange-500">
                       <button
                         onClick={() => handleQuantityChange(item.id, -1)}
-                        className="bg-gray-100 px-2 hover:bg-gray-200"
+                        className="bg-gray-100 px-2 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
                         type="button"
+                        disabled={Number(item.quantity || 0) <= 1}
                       >
                         -
                       </button>
                       <span className="px-2">{item.quantity}</span>
                       <button
                         onClick={() => handleQuantityChange(item.id, 1)}
-                        className="bg-gray-100 px-2 hover:bg-gray-200"
+                        className="bg-gray-100 px-2 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
                         type="button"
+                        disabled={isOutOfStock || (stockLimit !== null && item.quantity >= stockLimit)}
                       >
                         +
                       </button>
@@ -171,6 +210,10 @@ export default function CartDrawer({ showLabel = false }) {
                       <FaTrashAlt />
                     </button>
                   </div>
+                  </div>
+                      </>
+                    );
+                  })()}
                 </div>
               ))
             ) : (
@@ -181,7 +224,7 @@ export default function CartDrawer({ showLabel = false }) {
           <div className="border-t border-gray-200 bg-white p-2">
             <div className="mb-3 flex justify-end text-md font-semibold">
               <span className="me-2 text-gray-700">Sub-Total:</span>
-              <span>৳ {total}</span>
+              <span>Tk {total}</span>
             </div>
             <div className="flex justify-between gap-2">
               <Link
@@ -194,7 +237,12 @@ export default function CartDrawer({ showLabel = false }) {
               <Link
                 href="/checkout"
                 onClick={toggleDrawer}
-                className="w-1/2 cursor-pointer rounded bg-[#ff3300] px-2 py-2 text-center text-white transition duration-200 hover:bg-orange-600"
+                aria-disabled={hasStockIssue}
+                className={`w-1/2 rounded px-2 py-2 text-center text-white transition duration-200 ${
+                  hasStockIssue
+                    ? "pointer-events-none cursor-not-allowed bg-gray-300 text-gray-600"
+                    : "cursor-pointer bg-[#ff3300] hover:bg-orange-600"
+                }`}
               >
                 Checkout Now ({totalQuantity})
               </Link>

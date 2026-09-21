@@ -1,23 +1,41 @@
 import { BiEditAlt } from "react-icons/bi";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { FaCirclePlus, FaLocationDot } from "react-icons/fa6";
 
 const Address = ({
   addresses = [],
   selectedAddressId,
+  onAddAddressClick,
   onSelectAddress,
   onDeleteAddress,
   onEditAddress,
 }) => {
   if (!addresses.length) {
     return (
-      <div className="mt-4 rounded border border-dashed border-[#D0D5DD] bg-[#FCFCFC] p-5 text-sm font-medium text-gray-600">
-        No delivery address added yet.
+      <div className="mt-6 flex min-h-[220px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#ffc29f] bg-[#fffaf5] px-5 py-8 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#ffe7cc] text-[#ff3300]">
+          <FaLocationDot size={34} />
+        </div>
+        <h3 className="mt-4 text-xl font-bold text-[#111827]">
+          No delivery address added yet!
+        </h3>
+        <p className="mt-1 text-sm font-medium text-[#667085]">
+          Add a delivery address to proceed with your order.
+        </p>
+        <button
+          className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#ff3300] px-8 text-base font-bold text-white shadow-[0_10px_24px_rgba(255,51,0,0.25)]"
+          type="button"
+          onClick={onAddAddressClick}
+        >
+          <FaCirclePlus />
+          Add New Address
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="mt-4 grid-cols-1 gap-5 md:grid md:grid-cols-3">
+    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {addresses.map((address) => {
         const isSelected = selectedAddressId === address.id;
 
@@ -25,7 +43,7 @@ const Address = ({
           <label
             htmlFor={address.id}
             key={address.id}
-            className={`flex cursor-pointer flex-col gap-4 rounded-lg border-[2px] bg-[#FCFCFC] p-4 ${
+            className={`flex cursor-pointer flex-col gap-4 rounded-lg border-[2px] bg-[#FCFCFC] p-4 transition ${
               isSelected ? "border-orange-500" : "border-[#EAECF0]"
             }`}
           >
@@ -46,17 +64,9 @@ const Address = ({
                   +880 {address.mobileNumber}
                 </p>
               </div>
-              <span className="shrink-0 rounded bg-[#FFF0E9] px-2 py-1 text-xs font-semibold text-orange-600">
-                {address.category}
-              </span>
             </div>
             <div>
               <p className="text-sm text-gray-800">{address.displayAddress}</p>
-              {address.isDefault && (
-                <p className="mt-2 text-xs font-semibold text-[#12B76A]">
-                  Default address
-                </p>
-              )}
             </div>
             <div className="mt-auto flex justify-between gap-2">
               <button

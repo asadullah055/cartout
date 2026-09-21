@@ -20,6 +20,10 @@ const formatDate = (value) => {
 const formatDeliveryAddress = (address) => {
   if (!address) return "Address not available";
 
+  if (address.fullAddress) {
+    return address.fullAddress;
+  }
+
   if (address.division || address.district || address.upazila || address.area) {
     return [
       address.street,
@@ -33,7 +37,7 @@ const formatDeliveryAddress = (address) => {
       .join(", ");
   }
 
-  return [
+  const formattedAddress = [
     address.street,
     address.city,
     address.state,
@@ -42,6 +46,8 @@ const formatDeliveryAddress = (address) => {
   ]
     .filter(Boolean)
     .join(", ");
+
+  return formattedAddress || "Address not available";
 };
 
 const OrderSuccessPage = () => {

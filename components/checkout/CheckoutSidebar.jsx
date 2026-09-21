@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { FaArrowRight, FaGear, FaRegClipboard } from "react-icons/fa6";
+import { IoCheckmark } from "react-icons/io5";
 
 const CheckoutSidebar = ({
   subtotal,
@@ -7,115 +9,93 @@ const CheckoutSidebar = ({
   onPlaceOrder,
   isPlacingOrder,
   orderFeedback,
+  hasStockIssue = false,
 }) => {
   const totalPayment = subtotal + shippingFee;
 
   return (
-    <div className="mt-3 lg:min-w-[312px]">
-      <div className="sticky top-36 rounded bg-[#FFFFFF] p-0 md:p-5 lg:p-4">
-        <div className="p-3 md:p-0">
-          <h3 className="mb-3 text-sm font-bold text-primaryBlackText md:mb-0">Order Summary:</h3>
-          <hr className="mb-5 mt-3 hidden md:block" />
+    <aside className="h-fit rounded-xl bg-white px-5 py-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)] lg:sticky lg:top-5">
+      <div className="flex items-center gap-3 border-b border-[#e5e7eb] pb-5">
+        <FaRegClipboard className="text-[24px] text-[#1f2937]" />
+        <h3 className="text-xl font-bold text-[#111827]">Order Summary</h3>
+      </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between">
-              <p className="flex w-full justify-between text-sm font-medium text-primaryBlackText sm:text-base">
-                <span>Product Price:</span>
-                <span className="font-semibold text-primaryBlackText">Tk {subtotal}</span>
-              </p>
-            </div>
-            <div className="flex justify-between">
-              <span className="flex w-full justify-between text-sm font-medium text-primaryBlackText sm:text-base">
-                <p>
-                  Delivery <span className="inline xl:inline">Charge</span>:
-                </p>
-                <span className="font-semibold text-primaryBlackText">Tk {shippingFee}</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="my-2 border-b border-dashed sm:text-base md:my-6"></div>
-
-          <div className="mb-5 flex justify-between">
-            <div className="flex w-full justify-between text-sm font-bold md:text-base md:font-medium">
-              <p className="text-primaryBlackText">
-                Total <span className="inline lg:hidden xl:inline">Payment</span>:
-              </p>
-              <span className="font-semibold text-primaryBlackText">Tk {totalPayment}</span>
-            </div>
-          </div>
-
-          <div className="rounded-md p-3 sm:p-4">
-            <p className="text-[16px] font-medium text-primaryBlackText">Have a Cartout Coupon?</p>
-
-            <form className="mt-3 flex items-center gap-2">
-              <input
-                className="h-[40px] w-full rounded-md border border-[#D0D5DD] bg-white px-3 text-sm text-[#475467] outline-none"
-                required
-                placeholder="Promo / Coupon Code"
-                type="text"
-                defaultValue=""
-              />
-              <button
-                aria-label="Apply"
-                className="h-[40px] rounded-md bg-[#ff3300] px-6 text-sm font-semibold text-white transition duration-200 hover:bg-orange-600"
-                type="button"
-              >
-                Apply
-              </button>
-            </form>
-
-            <div className="mt-4 flex items-start gap-3">
-              <span className="mt-[2px] flex h-5 w-8 items-center justify-center rounded border border-[#7F56D9] bg-[#F4EBFF]">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9.5 3.5L4.75 8.25L2.5 6"
-                    stroke="#7F56D9"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-
-              <p className="text-xs font-medium leading-5 text-[#667085]">
-                I agree to the{" "}
-                <Link className="text-[#175CD3] no-underline" href="/content/terms-and-conditions">
-                  Terms &amp; Conditions,
-                </Link>{" "}
-                <Link className="text-[#175CD3] no-underline" href="/content/privacy-policy">
-                  Privacy Policy
-                </Link>{" "}
-                and{" "}
-                <Link className="text-[#175CD3] no-underline" href="/content/returns-and-refunds">
-                  Return &amp; Refund Policy
-                </Link>{" "}
-                of Cartout
-              </p>
-            </div>
-
-            <button
-              aria-label="Place Order"
-              className="mt-4 h-[42px] w-full rounded-full bg-[#ff3300] text-base font-semibold text-white transition duration-200 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-              type="button"
-              onClick={onPlaceOrder}
-              disabled={!totalItems || isPlacingOrder}
-            >
-              {isPlacingOrder ? "Placing..." : `Place Order (${totalItems})`}
-            </button>
-            {orderFeedback ? (
-              <p className="mt-2 text-center text-xs text-[#667085]">{orderFeedback}</p>
-            ) : null}
-          </div>
+      <div className="space-y-5 py-6">
+        <div className="flex items-center justify-between gap-4 text-base font-semibold text-[#1f2937]">
+          <span>Product Price:</span>
+          <span>Tk {subtotal}</span>
+        </div>
+        <div className="flex items-center justify-between gap-4 text-base font-semibold text-[#1f2937]">
+          <span>Delivery Charge:</span>
+          <span>Tk {shippingFee}</span>
         </div>
       </div>
-    </div>
+
+      <div className="border-b border-dashed border-[#cfd4dc]"></div>
+
+      <div className="flex items-center justify-between gap-4 py-6 text-base font-bold">
+        <span className="text-[#1f2937]">Total Payment:</span>
+        <span className="text-xl text-[#ff3300]">Tk {totalPayment}</span>
+      </div>
+
+      <div className="mb-4 flex items-center gap-3">
+        <FaGear className="text-[22px] text-[#111827]" />
+        <p className="text-base font-bold text-[#1f2937]">Have a Cartout Coupon?</p>
+      </div>
+
+      <form className="mb-5 flex items-center gap-3">
+        <input
+          className="h-11 min-w-0 flex-1 rounded-md border border-[#d0d5dd] bg-white px-4 text-sm font-medium text-[#475467] outline-none placeholder:text-[#b7bec8]"
+          required
+          placeholder="Promo / Coupon Code"
+          type="text"
+          defaultValue=""
+        />
+        <button
+          aria-label="Apply"
+          className="h-11 w-[96px] rounded-md bg-[#ff3300] text-sm font-bold text-white hover:bg-orange-600"
+          type="button"
+        >
+          Apply
+        </button>
+      </form>
+
+      <div className="flex items-start gap-3">
+        <span className="mt-[2px] flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#8b5cf6] bg-[#ede9fe] text-[#7c3aed]">
+          <IoCheckmark size={18} />
+        </span>
+
+        <p className="text-sm font-medium leading-5 text-[#667085]">
+          I agree to the{" "}
+          <Link className="font-bold text-[#175cd3] no-underline" href="/content/terms-and-conditions">
+            Terms &amp; Conditions,
+          </Link>{" "}
+          <Link className="font-bold text-[#175cd3] no-underline" href="/content/privacy-policy">
+            Privacy Policy
+          </Link>{" "}
+          and{" "}
+          <Link className="font-bold text-[#175cd3] no-underline" href="/content/returns-and-refunds">
+            Return &amp; Refund Policy
+          </Link>{" "}
+          of Cartout
+        </p>
+      </div>
+
+      <button
+        aria-label="Place Order"
+        className="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-full bg-[#ff3300] text-lg font-bold text-white shadow-[0_10px_24px_rgba(255,51,0,0.28)] hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+        type="button"
+        onClick={onPlaceOrder}
+        disabled={!totalItems || isPlacingOrder || hasStockIssue}
+      >
+        {isPlacingOrder ? "Placing..." : `Place Order (${totalItems})`}
+        <FaArrowRight className="text-base" />
+      </button>
+
+      {orderFeedback ? (
+        <p className="mt-3 text-center text-xs font-medium text-[#667085]">{orderFeedback}</p>
+      ) : null}
+    </aside>
   );
 };
 

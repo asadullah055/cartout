@@ -44,12 +44,16 @@ const Details = ({ product }) => {
     [product.variants]
   );
 
-  const [selectedVariant, setSelectedVariant] = useState(availableVariants[0]);
+  const defaultVariant =
+    availableVariants.find((v) => Number(v?.stock || 0) > 0) ||
+    availableVariants[0];
+  const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
   const [quantity, setQuantity] = useState(1);
 
   if (!selectedVariant) return null;
 
-  const maxStock = Math.max(1, selectedVariant.stock || 1);
+  const maxStock = Math.max(0, Number(selectedVariant.stock || 0));
+  const isOutOfStock = maxStock <= 0;
   const hasActiveDiscount = isDiscountActive(selectedVariant);
   const currentPrice = hasActiveDiscount
     ? selectedVariant.discountPrice
@@ -79,7 +83,12 @@ const Details = ({ product }) => {
     id: `${product._id}-${selectedVariant._id || "default"}`,
     productId: product._id,
     variantId: selectedVariant._id || "default",
+    sellerId: product?.creator?._id || "",
     name: product.productName,
+    shopName:
+      product?.creator?.shopName ||
+      product?.creator?.name ||
+      "Cartout Retailer",
     color:
       selectedVariant.attributes?.Color ||
       selectedVariant.attributes?.color ||
@@ -90,6 +99,7 @@ const Details = ({ product }) => {
       "",
     unitPrice: currentPrice,
     quantity,
+    maxStock,
     shippingCharge: product.shippingCharge || {
       insideDhaka: 80,
       outsideDhaka: 120,
@@ -98,11 +108,13 @@ const Details = ({ product }) => {
   });
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return;
     writeBuyNowItem(getCartItem());
     router.push("/checkout?buyNow=1");
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     addToCart(getCartItem());
     toast.success("Product added to cart");
   };
@@ -179,11 +191,17 @@ const Details = ({ product }) => {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-[12px] font-bold">
-        <p className="text-[#16a34a]">In Stock</p>
-        <p className="flex items-center gap-1 text-[#ff5a1f]">
-          <FaFire size={12} />
-          Only {selectedVariant.stock} left!
-        </p>
+        {isOutOfStock ? (
+          <p className="rounded bg-gray-100 px-2 py-1 text-gray-700">Out of Stock</p>
+        ) : (
+          <>
+            <p className="text-[#16a34a]">In Stock</p>
+            <p className="flex items-center gap-1 text-[#ff5a1f]">
+              <FaFire size={12} />
+              Only {maxStock} left!
+            </p>
+          </>
+        )}
       </div>
 
       <ProductDescription html={product.shortDescription} showAsFeatures />
@@ -204,17 +222,19 @@ const Details = ({ product }) => {
       <div className="mt-4 flex items-center gap-2">
         <label className="text-gray-700">Quantity:</label>
         <button
-          className="bg-gray-200 p-1"
+          className="bg-gray-200 p-1 disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+          disabled={isOutOfStock || quantity <= 1}
         >
           <HiOutlineMinusSm size={20} />
         </button>
         <span>{quantity}</span>
         <button
-          className="bg-gray-200 p-1"
+          className="bg-gray-200 p-1 disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           onClick={() => setQuantity((prev) => Math.min(maxStock, prev + 1))}
+          disabled={isOutOfStock || quantity >= maxStock}
         >
           <HiOutlinePlus />
         </button>
@@ -223,16 +243,18 @@ const Details = ({ product }) => {
       <div className="mt-4 flex w-full items-center gap-2 md:w-[80%]">
         <button
           onClick={handleBuyNow}
-          className="w-[40%] cursor-pointer rounded bg-amber-400 px-4 py-2 text-black transition duration-200 hover:bg-amber-500"
+          className="w-[40%] cursor-pointer rounded bg-amber-400 px-4 py-2 text-black transition duration-200 hover:bg-amber-500 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
           type="button"
+          disabled={isOutOfStock}
         >
-          Buy Now
+          {isOutOfStock ? "Out of Stock" : "Buy Now"}
         </button>
 
         <button
           onClick={handleAddToCart}
-          className="w-[40%] cursor-pointer rounded bg-[#ff3300] px-4 py-2 text-white transition duration-200 hover:bg-orange-600"
+          className="w-[40%] cursor-pointer rounded bg-[#ff3300] px-4 py-2 text-white transition duration-200 hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
           type="button"
+          disabled={isOutOfStock}
         >
           Add to Cart
         </button>

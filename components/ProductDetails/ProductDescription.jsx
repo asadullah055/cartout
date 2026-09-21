@@ -8,7 +8,7 @@ const ProductDescription = ({ html, showAsFeatures = false }) => {
     if (!showAsFeatures) {
       return (
         <div
-          className="text-[14px] leading-6 text-[#475467] [&_li]:mb-2 [&_li]:list-none [&_ol]:m-0 [&_ol]:list-none [&_ol]:p-0 [&_p]:mb-3 [&_ul]:m-0 [&_ul]:list-none [&_ul]:p-0"
+          className="max-w-full overflow-hidden break-words text-[14px] leading-6 text-[#475467] [&_*]:max-w-full [&_a]:break-words [&_img]:h-auto [&_img]:max-w-full [&_li]:mb-2 [&_li]:list-none [&_ol]:m-0 [&_ol]:list-none [&_ol]:p-0 [&_p]:mb-3 [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto [&_ul]:m-0 [&_ul]:list-none [&_ul]:p-0"
           dangerouslySetInnerHTML={{ __html: cleanHTML }}
         />
       );
