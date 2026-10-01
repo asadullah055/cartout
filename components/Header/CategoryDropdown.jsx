@@ -1,9 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import { FiChevronDown } from "react-icons/fi";
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://pinwheel-server.vercel.app/api"
+    : "http://localhost:8000/api");
 
 const CategoryDropdown = () => {
   const [categories, setCategories] = useState([]);
@@ -21,7 +28,7 @@ const CategoryDropdown = () => {
         setError("");
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/category/dropdownCategories`,
+          `${API_BASE_URL}/category/dropdownCategories`,
           {
             cache: "no-store",
           }
@@ -109,9 +116,12 @@ const CategoryDropdown = () => {
 
             {!isLoading && !error
               ? categories.map((category) => (
-                  <button
+                  <Link
                     key={category._id}
-                    type="button"
+                    href={`/products?category=${encodeURIComponent(
+                      category._id
+                    )}&categoryName=${encodeURIComponent(category.name || "")}`}
+                    onClick={() => setIsOpen(false)}
                     className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#fff7e8]"
                   >
                     <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f5f7fb]">
@@ -132,7 +142,7 @@ const CategoryDropdown = () => {
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-gray-800">
                       {category.name}
                     </span>
-                  </button>
+                  </Link>
                 ))
               : null}
           </div>

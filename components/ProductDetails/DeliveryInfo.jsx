@@ -157,7 +157,7 @@ const DeliveryInfo = ({ product }) => {
                 <div className="text-[14px] leading-[18px] text-[#101828]">
                   <div className="flex items-center gap-3.5">
                     <IoIosSync className="w-5 shrink-0 text-[22px] text-[#98a2b3]" />
-                    <span>14 days easy return</span>
+                    <span>3 days easy return</span>
                   </div>
 
                   <div className="mt-4">
@@ -197,7 +197,7 @@ const DeliveryInfo = ({ product }) => {
         <div className="text-[13px] leading-5 text-[#101828]">
           <div className="flex items-center gap-3.5">
             <IoIosSync className="w-4 shrink-0 text-[18px] text-[#475467]" />
-            <span className="text-[14px]">14 days easy return</span>
+            <span className="text-[14px]">3 days easy return</span>
           </div>
 
           <div className="mt-2.5 flex items-center gap-3.5">
