@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import CartItem from "@/components/Cart/CartItem";
 import OrderSummary from "@/components/Cart/OrderSummary";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -15,22 +16,37 @@ import {
 } from "@/utils/cart";
 
 const CartPage = () => {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
 
   useEffect(() => {
+    let active = true;
     const initialItems = readCart();
     setCartItems(initialItems);
-    refreshCartShopNames(initialItems).then(setCartItems);
+    setIsCartLoaded(true);
+    const initialSnapshot = JSON.stringify(initialItems);
+    refreshCartShopNames(initialItems, { persist: false }).then((items) => {
+      // A delayed refresh must not restore items removed while it was loading.
+      if (!active || JSON.stringify(readCart()) !== initialSnapshot) return;
+      if (JSON.stringify(items) !== initialSnapshot) writeCart(items);
+      setCartItems(items);
+    });
 
     const syncCart = () => setCartItems(readCart());
     window.addEventListener(cartEventName, syncCart);
     window.addEventListener("storage", syncCart);
 
     return () => {
+      active = false;
       window.removeEventListener(cartEventName, syncCart);
       window.removeEventListener("storage", syncCart);
     };
   }, []);
+
+  useEffect(() => {
+    if (isCartLoaded && cartItems.length === 0) router.replace("/");
+  }, [isCartLoaded, cartItems.length, router]);
 
   const handleQtyChange = (id, delta) => {
     const item = cartItems.find((entry) => entry.id === id);
@@ -73,6 +89,8 @@ const CartPage = () => {
       ? `${item.name || "This product"} is out of stock.`
       : `${item.name || "This product"} has only ${maxStock} items in stock.`;
   }, [cartItems]);
+
+  if (!isCartLoaded || cartItems.length === 0) return null;
 
   return (
     <div className="bg-gray-100">

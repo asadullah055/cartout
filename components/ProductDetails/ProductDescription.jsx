@@ -1,7 +1,13 @@
 import DOMPurify from "isomorphic-dompurify";
 
 const ProductDescription = ({ html, showAsFeatures = false }) => {
-    const cleanHTML = DOMPurify.sanitize(html || "");
+    const cleanHTML = DOMPurify.sanitize(html || "", {
+      ALLOWED_TAGS: ["p", "br", "div", "span", "strong", "b", "em", "i", "u", "s", "ul", "ol", "li", "blockquote", "h2", "h3", "h4", "table", "thead", "tbody", "tr", "th", "td", "a", "hr"],
+      ALLOWED_ATTR: ["href", "title", "colspan", "rowspan"],
+      ALLOW_DATA_ATTR: false,
+      ALLOW_ARIA_ATTR: false,
+      ALLOWED_URI_REGEXP: /^(?:https:\/\/|mailto:|\/(?!\/)|#)/i,
+    });
 
     if (!cleanHTML.trim()) return null;
 

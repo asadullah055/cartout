@@ -6,20 +6,16 @@ import { useEffect, useRef, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import { FiChevronDown } from "react-icons/fi";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://pinwheel-server.vercel.app/api"
-    : "http://localhost:8000/api");
-
 const CategoryDropdown = () => {
   const [categories, setCategories] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const wrapperRef = useRef(null);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
+    if (!isOpen || loadedRef.current) return;
     let ignore = false;
 
     const loadCategories = async () => {
@@ -28,7 +24,7 @@ const CategoryDropdown = () => {
         setError("");
 
         const res = await fetch(
-          `${API_BASE_URL}/category/dropdownCategories`,
+          "/api/catalog/categories",
           {
             cache: "no-store",
           }
@@ -46,6 +42,7 @@ const CategoryDropdown = () => {
               )
             : [];
           setCategories(nextCategories);
+          loadedRef.current = true;
         }
       } catch (fetchError) {
         if (!ignore) {
@@ -64,7 +61,7 @@ const CategoryDropdown = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     const handlePointerDown = (event) => {

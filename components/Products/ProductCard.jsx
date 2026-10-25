@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { addToCart, writeBuyNowItem } from "@/utils/cart";
+import { productImageUrl, productImageSrcSet } from "@/utils/productImage";
 
 const isDiscountActive = (variant) => {
   const discountPrice = Number(variant?.discountPrice);
@@ -27,7 +28,7 @@ const isDiscountActive = (variant) => {
 
 const FALLBACK_IMAGE = "/images/001.jpg";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, priority = false }) => {
   const router = useRouter();
   const availableVariants =
     product?.variants?.filter((v) => v.availability === true) || [];
@@ -39,6 +40,7 @@ const ProductCard = ({ product }) => {
     availableVariants[0];
   const stock = Number(variant?.stock || 0);
   const isOutOfStock = stock <= 0;
+  const image = product?.images?.[0] || FALLBACK_IMAGE;
   const hasActiveDiscount = isDiscountActive(variant);
 
   let discount = null;
@@ -86,7 +88,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="mt-2 w-full rounded-md bg-white p-1.5 hover:shadow-md sm:p-2">
-      <Link href={`/product/${product.slug}`}>
+      <Link href={`/product/${product.slug}`} prefetch={false}>
         <div className="relative overflow-hidden rounded-md border border-gray-100 bg-white p-1 transition duration-200 hover:border-orange-100">
           {discount && (
             <span className="absolute right-1 top-1 rounded bg-red-600 px-2 py-0.5 text-xs text-white">
@@ -99,12 +101,28 @@ const ProductCard = ({ product }) => {
             </span>
           )}
 
+          {/* Cloudinary serves responsive thumbnails directly, without a second image proxy. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={product?.images?.[0] || FALLBACK_IMAGE}
+            src={productImageUrl(image, 320)}
+            srcSet={productImageSrcSet(image)}
+            sizes="(min-width: 1440px) 260px, (min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
+            width={640}
+            height={640}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
             alt={product?.productName}
             className="h-36 w-full object-contain object-center sm:h-40"
             onError={(event) => {
-              event.currentTarget.src = FALLBACK_IMAGE;
+              const target = event.currentTarget;
+              target.removeAttribute("srcset");
+              if (!target.dataset.originalTried) {
+                target.dataset.originalTried = "true";
+                target.src = image;
+              } else if (target.getAttribute("src") !== FALLBACK_IMAGE) {
+                target.src = FALLBACK_IMAGE;
+              }
             }}
           />
         </div>

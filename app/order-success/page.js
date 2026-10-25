@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa6";
+import { paymentRequest, startBkashPayment } from "@/utils/payment";
+import AdvancePaymentNotice from "@/components/checkout/AdvancePaymentNotice";
 
 const ORDER_STORAGE_KEY = "pinwheel_last_order";
 
@@ -52,17 +54,73 @@ const formatDeliveryAddress = (address) => {
 
 const OrderSuccessPage = () => {
   const [orderData, setOrderData] = useState(null);
+  const [feedback, setFeedback] = useState("");
+  const [isChecking, setIsChecking] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
 
   useEffect(() => {
-    try {
-      const rawOrder = window.sessionStorage.getItem(ORDER_STORAGE_KEY);
-      setOrderData(rawOrder ? JSON.parse(rawOrder) : null);
-    } catch {
-      setOrderData(null);
-    }
+    let active = true;
+    const load = async () => {
+      try {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const rawOrder = window.sessionStorage.getItem(ORDER_STORAGE_KEY);
+        const saved = rawOrder ? JSON.parse(rawOrder) : null;
+        const id = params.get("orderId") || saved?.order?._id;
+        const token = params.get("token") || saved?.order?.invoiceAccessToken;
+        if (active) {
+          setOrderData(saved);
+          setFeedback(window.sessionStorage.getItem("pinwheel_payment_feedback") || "");
+        }
+        window.sessionStorage.removeItem("pinwheel_payment_feedback");
+        if (id && token) {
+          // Persist return credentials before clearing the URL so a refresh can recover.
+          const pending = saved?.order?._id === id ? saved : { order: { _id: id, invoiceAccessToken: token } };
+          if (active) setOrderData(pending);
+          window.sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(pending));
+          window.history.replaceState(null, "", window.location.pathname);
+          const data = await paymentRequest(`${id}/payment-status`, { token });
+          const updated = { ...pending, order: data.order };
+          window.sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(updated));
+          if (active) setOrderData(updated);
+        }
+      } catch (error) { if (active) setFeedback(error.message); }
+      finally { if (active) setIsChecking(false); }
+    };
+    load();
+    return () => { active = false; };
   }, []);
 
   const order = orderData?.order;
+  const isBkash = order?.paymentMethod === "bKash";
+  const isAwaitingPayment = isBkash && !Number(order?.paidAmount);
+  const paidAmount = Number(order?.paidAmount || 0);
+  const needsManualAdvance = order?.paymentMethod === "Cash on Delivery" && order?.status === "Pending" && paidAmount < 100;
+  const refreshPayment = async () => {
+    setIsChecking(true);
+    setFeedback("");
+    try {
+      const data = await paymentRequest(`${order._id}/payment-status`, { token: order.invoiceAccessToken });
+      const updated = { ...orderData, order: data.order };
+      window.sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(updated));
+      setOrderData(updated);
+      if (!data.order.paidAmount) setFeedback("Payment has not been confirmed yet. You can continue payment or check again.");
+    } catch (error) { setFeedback(error.message); }
+    finally { setIsChecking(false); }
+  };
+  const continuePayment = async () => {
+    setIsPaying(true);
+    setFeedback("");
+    try {
+      const data = await startBkashPayment(order);
+      if (data.checkoutUrl) window.location.assign(data.checkoutUrl);
+      else if (data.order) {
+        const updated = { ...orderData, order: data.order };
+        window.sessionStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(updated));
+        setOrderData(updated);
+      }
+    } catch (error) { setFeedback(error.message); }
+    finally { setIsPaying(false); }
+  };
   const fallbackItems = useMemo(() => orderData?.orderedItems || [], [orderData?.orderedItems]);
   const orderItems = order?.items?.length ? order.items : fallbackItems;
 
@@ -93,14 +151,15 @@ const OrderSuccessPage = () => {
     return `${process.env.NEXT_PUBLIC_API_URL}/order/${order._id}/invoice${token}`;
   }, [order?._id, order?.invoiceAccessToken]);
 
-  if (!orderData) {
+  if (!orderData || !order?.paymentMethod) {
     return (
       <main className="bg-gray-100 px-3 py-10">
         <section className="mx-auto max-w-[720px] rounded bg-white p-6 text-center">
-          <h1 className="text-xl font-semibold text-gray-900">No recent order found</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{isChecking ? "Checking your order..." : order?._id ? "Unable to load your order" : "No recent order found"}</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Place an order first to see the order confirmation details.
+            {feedback || "Place an order first to see the order confirmation details."}
           </p>
+          {order?._id && !isChecking && <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded border border-gray-300 px-4 py-2 text-sm font-semibold">Check Order Again</button>}
           <Link
             href="/"
             className="mt-5 inline-flex rounded bg-[#ff3300] px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600"
@@ -120,10 +179,10 @@ const OrderSuccessPage = () => {
             <FaCheck size={24} />
           </span>
           <h1 className="mt-3 text-2xl font-semibold text-gray-900">
-            Welcome to Cartout
+            {isAwaitingPayment ? "Complete your bKash payment" : needsManualAdvance ? "Your order has been received" : "Welcome to Cartout"}
           </h1>
           <p className="mt-1 text-sm text-gray-600">
-            Your order has been placed successfully.
+            {isAwaitingPayment ? "Your order is saved and is awaiting payment confirmation." : needsManualAdvance ? "Please complete the advance payment below to confirm your order." : "Your order has been placed successfully."}
           </p>
         </div>
 
@@ -146,7 +205,7 @@ const OrderSuccessPage = () => {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase text-gray-500">Status</p>
-            <p className="mt-1 font-semibold text-[#ff3300]">Product wise</p>
+            <p className="mt-1 font-semibold text-[#ff3300]">{order?.status || "Pending"}</p>
           </div>
         </div>
 
@@ -203,7 +262,26 @@ const OrderSuccessPage = () => {
                   <span className="text-[#ff3300]">Tk {totalPayment}</span>
                 </div>
               </div>
+              <div className="flex justify-between"><span>Payment status</span><span className="font-semibold">{order?.paymentStatus || "Pending"}</span></div>
+              {isBkash && <>
+                <div className="flex justify-between"><span>Payment plan</span><span>{order.paymentPlan === "Advance" ? "Advance Payment" : "Full Payment"}</span></div>
+                <div className="flex justify-between"><span>Paid with bKash</span><span>Tk {paidAmount}</span></div>
+                {isAwaitingPayment && <div className="flex justify-between font-semibold text-[#e2136e]"><span>bKash payment required</span><span>Tk {order.paymentAmount}</span></div>}
+                <div className="flex justify-between"><span>{isAwaitingPayment ? "On delivery after payment" : "Due on delivery"}</span><span>Tk {Math.max(totalPayment - (isAwaitingPayment ? order.paymentAmount : paidAmount), 0)}</span></div>
+                {order.bkash?.transactionId && <p className="break-all text-xs text-gray-600">Transaction ID: {order.bkash.transactionId}</p>}
+              </>}
             </div>
+
+            {needsManualAdvance && <div className="mt-4"><AdvancePaymentNotice /></div>}
+
+            {isAwaitingPayment && order.status === "Awaiting Payment" && (
+              <div className="mt-4 space-y-2">
+                <button type="button" onClick={continuePayment} disabled={isPaying || isChecking} className="w-full rounded bg-[#e2136e] px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{isPaying ? "Opening bKash..." : `Continue bKash Payment — Tk ${order.paymentAmount}`}</button>
+                <button type="button" onClick={refreshPayment} disabled={isPaying || isChecking} className="w-full rounded border border-gray-300 px-4 py-2 text-sm font-semibold disabled:opacity-50">{isChecking ? "Checking..." : "Check Payment Status"}</button>
+                <p className="text-xs text-gray-500">If money was deducted, check payment status before trying again.</p>
+              </div>
+            )}
+            {feedback && <p role="status" className="mt-3 text-sm text-amber-800">{feedback}</p>}
 
             <div className="mt-5 rounded bg-gray-50 p-3 text-sm text-gray-700">
               <p className="font-semibold text-gray-900">Delivery Address</p>

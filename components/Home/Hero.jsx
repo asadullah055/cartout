@@ -1,16 +1,7 @@
 
 import Image from "next/image";
 import ShowBanner from "./ShowBanner";
-
-async function getBanners() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/banner/get-active-banner`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Failed to fetch banners");
-  return res.json();
-}
-const Hero = async () => {
-  const data = await getBanners();
+const Hero = ({ data }) => {
   const banners = data.banners ?? [];
   const sideBanners = banners.filter(banner => banner.bannerType === 'side');
   const sideBanner = sideBanners[0];

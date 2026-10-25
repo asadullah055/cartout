@@ -4,11 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ProductCard from "./ProductCard";
 
 const PRODUCTS_PER_PAGE = 20;
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://pinwheel-server.vercel.app/api"
-    : "http://localhost:8000/api");
 
 const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }) => {
   const [products, setProducts] = useState([]);
@@ -40,7 +35,7 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/product/publicProducts?${params.toString()}`,
+          `/api/catalog/products?${params.toString()}`,
           { cache: "no-store" }
         );
         const data = await response.json().catch(() => ({}));
@@ -123,8 +118,8 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
 
       {products.length > 0 ? (
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2 md:grid-cols-4 lg:grid-cols-5">
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
+          {products.map((product, index) => (
+            <ProductCard key={product._id} product={product} priority={index < 2} />
           ))}
         </div>
       ) : null}

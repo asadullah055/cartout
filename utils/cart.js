@@ -171,7 +171,8 @@ export const refreshCartShopNames = async (items, options = {}) => {
     };
   });
 
-  if (hasChanges && options.persist !== false) {
+  // Do not overwrite a cart edited or cleared while product details were loading.
+  if (hasChanges && options.persist !== false && JSON.stringify(readCart()) === JSON.stringify(items)) {
     writeCart(nextItems);
   }
 

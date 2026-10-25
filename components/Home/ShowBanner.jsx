@@ -10,6 +10,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 const ShowBanner = ({ banners }) => {
+    const safeTarget = (value) => {
+        if (typeof value !== "string" || /[\s\\\u0000-\u001F\u007F]/u.test(value)) return "#";
+        if (/^\/(?!\/)/.test(value)) return value;
+        try { const url = new URL(value); return url.protocol === "https:" && !url.username && !url.password ? url.href : "#"; }
+        catch { return "#"; }
+    };
     const mainBanners = banners.filter(banner => banner.bannerType === 'main');
 
     return (
@@ -23,8 +29,9 @@ const ShowBanner = ({ banners }) => {
             {mainBanners.map((banner, index) => (
                 <SwiperSlide key={banner._id}>
                     <Link
-                        href={banner.targetUrl ?? "#"}
+                        href={safeTarget(banner.targetUrl)}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="relative block h-full w-full overflow-hidden rounded-lg bg-[#eef4ff]"
                     >
                         <Image
