@@ -59,8 +59,25 @@ shipping charge ও stock যাচাই করে চূড়ান্ত সি
 - Cart-এর কাজ, category ও search-এর ফলাফল, পর্দার আকার অনুযায়ী ছবি লোড হওয়া এবং
   product details URL পরীক্ষা করুন।
 - Deploy করার পর product details URL-গুলো HTTP 200 দিচ্ছে কি না যাচাই করুন।
-  HTTP 500 এলে Vercel runtime logs দেখুন। আগের live সাইটে পাওয়া 500 error-এর
-  নির্দিষ্ট কারণ ওই deployment-এর logs ছাড়া নিশ্চিত করা যায় না।
+  HTTP 500 এলে Vercel runtime logs দেখুন।
 - ১.৬ Mbps সংযোগ, ১৫০ ms latency এবং CPU চার গুণ ধীর করে মোবাইলের পরীক্ষা আবার
   চালান। নিজের কম্পিউটারে পাওয়া সময় দিয়ে live ওয়েবসাইটের প্রকৃত গতি নিশ্চিত করা
   যায় না; public URL-এও আলাদাভাবে মাপতে হবে।
+
+## Production-এর ESM error-এর সমাধান
+
+Vercel runtime log-এ `ERR_REQUIRE_ESM` পাওয়া গেছে। Backend চালু হওয়ার সময়
+`html-encoding-sniffer` থেকে ESM-only `@exodus/bytes`-কে `require()` দিয়ে লোড করতে
+গিয়ে function বন্ধ হয়ে যাচ্ছিল। ফলে product, product list ও banner API-ও 500 দিচ্ছিল।
+
+Frontend ও backend-এ CommonJS-এর সঙ্গে সামঞ্জস্যপূর্ণ `isomorphic-dompurify`
+`2.26.0` এবং `jsdom` `26.1.0` নির্দিষ্ট করা হয়েছে। DOMPurify sanitizer-এর বর্তমান
+`3.4.17` সংস্করণ lockfile-এ রাখা হয়েছে। Backend-এর `MetaData.js`-এ একই CommonJS
+পদ্ধতি ব্যবহার করা হয়েছে। Invoice-এর Chromium ও Puppeteer ESM package এখন PDF
+তৈরির সময় `import()` দিয়ে লোড হয়।
+
+এই সমাধান deploy করতে দুই প্রজেক্টের `package.json` এবং `package-lock.json`-সহ
+পরিবর্তিত ফাইলগুলো commit ও push করুন। শুধু পুরোনো commit redeploy করলে সমাধানটি
+কার্যকর হবে না। পরিষ্কার installation-এর জন্য `npm ci` ব্যবহার করা যায়।
+`server` ফোল্ডারে `node --test test/runtime.test.js` চালিয়ে CommonJS startup ও
+HTML sanitization যাচাই করা যায়; এই test production database ব্যবহার করে না।
