@@ -1,0 +1,92 @@
+.description {
+  min-width: 0;
+  max-width: 100%;
+  color: #172033;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* Match the editor's compact blocks; saved blank paragraphs retain line breaks. */
+.description :is(p, h2, h3, h4) {
+  margin: 0;
+}
+
+.description :is(h2, h3, h4) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.description :is(ul, ol) {
+  margin: 0;
+  padding-inline-start: 1.25em;
+  list-style-position: outside;
+}
+
+.description ul {
+  list-style-type: disc;
+}
+
+.description ol {
+  list-style-type: decimal;
+}
+
+.description li {
+  display: list-item;
+  margin: 0;
+}
+
+.description li::marker {
+  color: currentColor;
+}
+
+.description ul ul {
+  list-style-type: circle;
+}
+
+.description ul ul ul {
+  list-style-type: square;
+}
+
+.description a {
+  color: #0369a1;
+  text-decoration: underline;
+}
+
+.description blockquote {
+  margin: 0.75em 0;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid #d1d5db;
+}
+
+.tableScroll {
+  max-width: 100%;
+  margin-block: 1em;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.tableScroll:focus-visible {
+  outline: 2px solid #ff5a1f;
+  outline-offset: 2px;
+}
+
+.description table {
+  display: table;
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  empty-cells: show;
+}
+
+.description :is(th, td) {
+  min-width: 2em;
+  padding: 0.4em;
+  border: 1px solid #d9d9d9;
+  text-align: start;
+  vertical-align: middle;
+}
+
+.description th {
+  font-weight: 600;
+}
