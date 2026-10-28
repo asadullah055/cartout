@@ -5,7 +5,15 @@ import ProductCard from "./ProductCard";
 
 const PRODUCTS_PER_PAGE = 20;
 
-const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }) => {
+const ProductResults = ({
+  categoryId = "",
+  categoryName = "",
+  brandId = "",
+  brandName = "",
+  sellerId = "",
+  sellerName = "",
+  searchQuery = "",
+}) => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
   const [totalProducts, setTotalProducts] = useState(null);
@@ -13,7 +21,7 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
   const [errorMessage, setErrorMessage] = useState("");
   const loaderRef = useRef(null);
   const loadingRequestRef = useRef("");
-  const filterKey = `${categoryId}:${searchQuery}`;
+  const filterKey = JSON.stringify([categoryId, brandId, sellerId, searchQuery]);
   const activeFilterRef = useRef(filterKey);
   const hasMore = totalProducts === null || products.length < totalProducts;
 
@@ -31,6 +39,8 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
         limit: String(PRODUCTS_PER_PAGE),
       });
       if (categoryId) params.set("category", categoryId);
+      if (brandId) params.set("brand", brandId);
+      if (sellerId) params.set("seller", sellerId);
       if (searchQuery) params.set("search", searchQuery);
 
       try {
@@ -67,7 +77,7 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
         }
       }
     },
-    [categoryId, filterKey, searchQuery]
+    [brandId, categoryId, filterKey, searchQuery, sellerId]
   );
 
   useEffect(() => {
@@ -97,7 +107,11 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
     return () => observer.disconnect();
   }, [hasMore, isLoading, loadProducts, page]);
 
-  const heading = searchQuery
+  const heading = sellerId
+    ? `${sellerName || "Seller"} Products${brandId ? ` by ${brandName || "Brand"}` : ""}${categoryName ? ` in ${categoryName}` : ""}${searchQuery ? ` matching “${searchQuery}”` : ""}`
+    : brandId
+    ? `${brandName || "Brand"} Products${categoryName ? ` in ${categoryName}` : ""}${searchQuery ? ` matching “${searchQuery}”` : ""}`
+    : searchQuery
     ? `Search results for “${searchQuery}”${categoryName ? ` in ${categoryName}` : ""}`
     : categoryName
     ? `${categoryName} Products`
@@ -141,7 +155,7 @@ const ProductResults = ({ categoryId = "", categoryName = "", searchQuery = "" }
           <div className="text-center">
             <p className="text-lg font-semibold text-gray-700">No products found</p>
             <p className="mt-1 text-sm text-gray-500">
-              Try another search or choose a different category.
+              Try another search or choose a different category, brand or seller.
             </p>
           </div>
         ) : null}

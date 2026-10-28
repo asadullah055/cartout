@@ -10,6 +10,12 @@ export default async function ProductsPage({ searchParams }) {
   const categoryId = typeof params?.category === "string" ? params.category : "";
   const categoryName =
     typeof params?.categoryName === "string" ? params.categoryName : "";
+  const brandId = typeof params?.brand === "string" ? params.brand : "";
+  const brandName =
+    typeof params?.brandName === "string" ? params.brandName : "";
+  const sellerId = typeof params?.seller === "string" ? params.seller : "";
+  const sellerName =
+    typeof params?.sellerName === "string" ? params.sellerName : "";
   const searchQuery = typeof params?.search === "string" ? params.search.trim() : "";
 
   return (
@@ -17,6 +23,10 @@ export default async function ProductsPage({ searchParams }) {
       <ProductResults
         categoryId={categoryId}
         categoryName={categoryName}
+        brandId={brandId}
+        brandName={brandName}
+        sellerId={sellerId}
+        sellerName={sellerName}
         searchQuery={searchQuery}
       />
     </main>

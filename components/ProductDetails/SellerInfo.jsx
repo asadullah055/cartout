@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 const SellerInfo = ({ product }) => {
@@ -5,9 +6,12 @@ const SellerInfo = ({ product }) => {
     product?.creator?.shopName ||
     product?.creator?.name ||
     "Cartout Retailer";
+  const sellerId = product?.creator?._id;
   const sku = product?.sku || "N/A";
   const categoryName = product?.category?.name || "N/A";
+  const categoryId = product?.category?._id;
   const brandName = product?.brand?.name || "N/A";
+  const brandId = product?.brand?._id;
   return (
     <div className="rounded-md px-5 pb-5 pt-2 text-[#475467]">
       {/* Sold by and Chat */}
@@ -17,7 +21,16 @@ const SellerInfo = ({ product }) => {
             Sold By
           </p>
           <p className="truncate text-[15px] font-semibold leading-5 text-[#4169e1]">
-            {sellerName}
+            {sellerId ? (
+              <Link
+                href={`/products?${new URLSearchParams({ seller: sellerId, sellerName })}`}
+                className="no-underline hover:no-underline"
+              >
+                {sellerName}
+              </Link>
+            ) : (
+              sellerName
+            )}
           </p>
         </div>
         <button
@@ -45,7 +58,16 @@ const SellerInfo = ({ product }) => {
             Category
           </dt>
           <dd className="text-[14px] font-medium leading-5 text-[#344054]">
-            {categoryName}
+            {categoryId ? (
+              <Link
+                href={`/products?${new URLSearchParams({ category: categoryId, categoryName })}`}
+                className="text-[#4169e1] no-underline hover:no-underline"
+              >
+                {categoryName}
+              </Link>
+            ) : (
+              categoryName
+            )}
           </dd>
         </div>
         <div className="grid grid-cols-[76px_minmax(0,1fr)] items-start gap-2">
@@ -53,7 +75,16 @@ const SellerInfo = ({ product }) => {
             Brand
           </dt>
           <dd className="text-[14px] font-medium leading-5 text-[#344054]">
-            {brandName}
+            {brandId ? (
+              <Link
+                href={`/products?${new URLSearchParams({ brand: brandId, brandName })}`}
+                className="text-[#4169e1] no-underline hover:no-underline"
+              >
+                {brandName}
+              </Link>
+            ) : (
+              brandName
+            )}
           </dd>
         </div>
       </dl>

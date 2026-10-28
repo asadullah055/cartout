@@ -1,0 +1,4 @@
+1. Brand e click korle oi brand er joto product ache seta dekhabe. 
+2. Catagory select korle same vabe dekhabe
+3. Seller e dhukle oi seller er joto products ache segulo dekhabe
+4. Product page e description er ses e related product catagory onujayi স্লাইড akare dekhabe.

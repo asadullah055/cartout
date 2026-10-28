@@ -2,8 +2,10 @@ import DeliveryInfo from "@/components/ProductDetails/DeliveryInfo";
 import Details from "@/components/ProductDetails/Details";
 import ImageSlider from "@/components/ProductDetails/ImageSlider";
 import ProductTabs from "@/components/ProductDetails/ProductTabs";
+import RelatedProducts from "@/components/ProductDetails/RelatedProducts";
 import SellerInfo from "@/components/ProductDetails/SellerInfo";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -64,6 +66,9 @@ const ProductDetails = async ({ params }) => {
         <ProductDescription html={product.description} />
       </div> */}
       <ProductTabs product={product} />
+      <Suspense key={product._id} fallback={null}>
+        <RelatedProducts product={product} />
+      </Suspense>
     </div>
   );
 };

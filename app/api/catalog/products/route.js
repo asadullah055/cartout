@@ -2,7 +2,7 @@ import { getProducts } from "@/utils/catalog";
 
 export async function GET(request) {
   const params = new URL(request.url).searchParams;
-  const allowed = new Set(["page", "limit", "category", "search", "q"]);
+  const allowed = new Set(["page", "limit", "category", "brand", "seller", "search", "q"]);
   if ([...params.keys()].some((key) => !allowed.has(key) || params.getAll(key).length > 1)) {
     return Response.json({ message: "Invalid product filters" }, { status: 400 });
   }
